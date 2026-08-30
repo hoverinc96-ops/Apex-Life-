@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.run/
+dist/
+*.log
+
+# secrets
+.env
+node_modules

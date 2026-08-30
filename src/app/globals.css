@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-900: #0a1628;
+  --color-navy-800: #0f1d36;
+  --color-navy-700: #152240;
+  --color-navy-600: #1a2a4a;
+  --color-gold-500: #d4a843;
+  --color-gold-400: #e0b84c;
+  --color-gold-300: #ebc96a;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background-color: var(--color-navy-900); color: #ffffff; font-family: var(--font-sans); }
+.text-gradient { background: linear-gradient(135deg, #d4a843 0%, #f0d78c 50%, #d4a843 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+@keyframes waveform-pulse { 0%, 100% { transform: scaleY(.45); opacity: .55; } 50% { transform: scaleY(1); opacity: 1; } }
+.waveform-bar { animation: waveform-pulse 1s ease-in-out infinite; transform-origin: center; }
+@keyframes message-slide-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.message-new { animation: message-slide-in .45s ease-out both; }

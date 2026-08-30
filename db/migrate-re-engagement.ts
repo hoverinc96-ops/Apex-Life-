@@ -1,0 +1,4 @@
+import { Pool } from "pg";
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const DDL = `CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; CREATE TABLE IF NOT EXISTS re_engagement_queue (id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE, quote_id UUID REFERENCES quotes(id) ON DELETE SET NULL, step INTEGER NOT NULL DEFAULT 1, channel VARCHAR(10) NOT NULL DEFAULT 'email', status VARCHAR(20) NOT NULL DEFAULT 'pending', scheduled_for TIMESTAMPTZ NOT NULL, sent_at TIMESTAMPTZ, error_message TEXT, created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP); CREATE INDEX IF NOT EXISTS idx_re_engagement_pending ON re_engagement_queue(status, scheduled_for);`;
+(async () => { try { await pool.query(DDL); console.log("Re-engagement migration completed successfully."); } catch (e) { console.error(e); process.exitCode = 1; } finally { await pool.end(); } })();
