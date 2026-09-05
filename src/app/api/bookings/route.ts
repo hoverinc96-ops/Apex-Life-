@@ -18,7 +18,7 @@ const TOPICS = new Set([
 ]) as ReadonlySet<string>;
 
 /** Exact, versioned consent text the requester agrees to on the /book form. */
-export const BOOKING_CONSENT_TEXT =
+const BOOKING_CONSENT_TEXT =
   "I agree to be contacted by Apex Life AI by email and/or phone about this request. I understand this is a request for a call, not a confirmed appointment.";
 
 /**
