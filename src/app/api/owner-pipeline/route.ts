@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
         ORDER BY created_at DESC`
     );
     const bookings = await pool.query(
-      `SELECT id, name, email, phone, topic, requested_time, status, owner_only, created_at
+      `SELECT id, name, email, phone, topic, requested_time, status, owner_only,
+              google_sync_status, google_event_id, created_at
          FROM bookings
         ORDER BY created_at DESC`
     );

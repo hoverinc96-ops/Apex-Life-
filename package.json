@@ -13,6 +13,7 @@
     "db:migrate-team-handoff": "bun run db/migrate-team-handoff.ts",
     "db:migrate-handoff-hardening": "bun run db/migrate-handoff-hardening.ts",
     "db:migrate-bookings": "bun run db/migrate-bookings.ts",
+    "db:migrate-calendar": "bun run db/migrate-google-calendar-sync.ts",
     "db:migrate-timeline": "bun run db/migrate-timeline.ts",
     "db:seed": "bun run db/seed.ts",
     "test:pii": "bun run src/lib/pii-scrubber.test.ts"
