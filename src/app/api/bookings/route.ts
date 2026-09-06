@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { logFormSubmitted } from "@/lib/compliance";
+import { syncBookingToCalendar } from "@/lib/google-calendar";
 
 /** Extract a client IP from common proxy headers; falls back to null. */
 function clientIp(request: NextRequest): string | null {
@@ -25,8 +26,15 @@ const BOOKING_CONSENT_TEXT =
  * POST /api/bookings — lightweight booking request (owner's private pipeline,
  * Mode-1 owner seat). FAIL-CLOSED: missing/invalid name or email rejects the
  * request (400). Phone is optional, topic defaults to 'general', and
- * requested_time is free text (no calendar integration — the owner confirms
- * by email, so we never claim an auto-confirmed slot).
+ * requested_time is free text (the owner confirms by email, so we never claim
+ * an auto-confirmed slot).
+ *
+ * After the booking row is saved, a best-effort sync creates a TENTATIVE
+ * placeholder event on the OWNER's personal Google Calendar (owner_only=TRUE
+ * rows only; never partner/tenant data). The sync is non-blocking and
+ * fail-closed: missing Google creds or missing OAuth authorization just
+ * leaves google_sync_status at a skipped value — the booking always
+ * succeeds and the audit is always written.
  *
  * Compliance: the submission is audited via the compliance vault helper
  * (form_submitted, funnel=book_page) with the exact consent text the person
@@ -80,6 +88,14 @@ export async function POST(request: NextRequest) {
        RETURNING id, name, email, phone, topic, requested_time, status, owner_only, created_at`,
       [name.trim(), email.trim(), phoneValue, topicValue, requestedTimeValue]
     );
+    const bookingRow = result.rows[0] as {
+      id: string;
+      name: string;
+      email: string;
+      phone: string | null;
+      topic: string;
+      requested_time: string | null;
+    };
 
     // DNC-sensitivity check for the audit trail: was this contact already on
     // our do-not-contact list? Their fresh inbound request + consent still
@@ -121,9 +137,56 @@ export async function POST(request: NextRequest) {
       console.error("POST /api/bookings audit write error:", auditErr);
     }
 
+    // Best-effort owner-calendar sync (non-blocking, fail-closed). Runs
+    // AFTER the booking row + audit are saved, so the booking always
+    // succeeds even when Google creds/auth are absent or Google errors.
+    // Only the booking id is logged — never PII.
+    let syncStatus = "not_synced";
+    let syncEventId: string | null = null;
+    try {
+      const outcome = await syncBookingToCalendar({
+        id: bookingRow.id,
+        name: bookingRow.name,
+        email: bookingRow.email,
+        phone: bookingRow.phone,
+        topic: topicValue,
+        requested_time: requestedTimeValue,
+      });
+      if (outcome.ok) {
+        syncStatus = "synced";
+        syncEventId = outcome.eventId;
+      } else {
+        syncStatus =
+          outcome.skipped === "not_configured"
+            ? "skipped_no_config"
+            : outcome.skipped === "not_authorized"
+              ? "skipped_no_auth"
+              : "error";
+      }
+    } catch {
+      // syncBookingToCalendar is designed not to throw, but a belt-and-
+      // braces guard guarantees the booking still succeeds no matter what.
+      console.error(`POST /api/bookings calendar sync error (booking ${bookingRow.id})`);
+      syncStatus = "error";
+    }
+    try {
+      await pool.query(
+        `UPDATE bookings
+            SET google_sync_status = $2, google_event_id = $3, updated_at = CURRENT_TIMESTAMP
+          WHERE id = $1`,
+        [bookingRow.id, syncStatus, syncEventId]
+      );
+    } catch {
+      // Migration may not have run yet (columns absent) — booking + audit
+      // already saved, so log and continue rather than failing the form.
+      console.error(`POST /api/bookings sync-status write error (booking ${bookingRow.id})`);
+    }
+
     return NextResponse.json(
       {
         ...result.rows[0],
+        google_sync_status: syncStatus,
+        google_event_id: syncEventId,
         message:
           "We've received your request — we'll confirm your preferred time by email. Nothing is booked yet.",
       },

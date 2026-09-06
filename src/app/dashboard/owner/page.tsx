@@ -24,6 +24,8 @@ interface BookingRow {
   requested_time: string | null;
   status: string;
   owner_only: boolean;
+  google_sync_status?: string | null;
+  google_event_id?: string | null;
   created_at: string;
 }
 
@@ -171,13 +173,14 @@ export default function OwnerDashboardPage() {
                     <th className="px-5 py-3 font-medium">Topic</th>
                     <th className="px-5 py-3 font-medium">Preferred time</th>
                     <th className="px-5 py-3 font-medium">Status</th>
+                    <th className="px-5 py-3 font-medium">Calendar</th>
                     <th className="px-5 py-3 font-medium">Received</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.bookings.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-5 py-6 text-center text-slate-500">
+                      <td colSpan={8} className="px-5 py-6 text-center text-slate-500">
                         No booking requests yet.
                       </td>
                     </tr>
@@ -190,6 +193,16 @@ export default function OwnerDashboardPage() {
                       <td className="px-5 py-2.5 text-slate-400">{r.topic}</td>
                       <td className="px-5 py-2.5 text-slate-400">{r.requested_time || "Any — you pick"}</td>
                       <td className="px-5 py-2.5"><StatusBadge status={r.status} meta={BOOKING_STATUS_META} /></td>
+                      <td className="px-5 py-2.5 text-xs text-slate-500">
+                        {r.google_sync_status === "synced"
+                          ? "Synced ✓"
+                          : r.google_sync_status === "skipped_no_config" ||
+                              r.google_sync_status === "skipped_no_auth"
+                            ? "Not synced (calendar not connected)"
+                            : r.google_sync_status === "error"
+                              ? "Sync error"
+                              : "Not synced"}
+                      </td>
                       <td className="px-5 py-2.5 text-xs text-slate-500">{fmtTimestamp(r.created_at)}</td>
                     </tr>
                   ))}
