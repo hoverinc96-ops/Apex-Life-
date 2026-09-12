@@ -1,3 +1,4 @@
+import type { NextRequest } from "next/server";
 import pool from "@/lib/db";
 
 /**
@@ -57,6 +58,18 @@ export function calendarConfigured(): boolean {
   return Boolean(
     process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
   );
+}
+
+/**
+ * Public site origin behind the platform proxy. request.nextUrl.origin
+ * resolves to the internal bind address (e.g. https://0.0.0.0:3000), so
+ * derive the origin from x-forwarded-proto / x-forwarded-host instead.
+ */
+export function siteOrigin(request: NextRequest): string {
+  const proto = request.headers.get("x-forwarded-proto") ?? "http";
+  const host =
+    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  return host ? `${proto}://${host}` : request.nextUrl.origin;
 }
 
 function redirectUri(origin: string): string {
