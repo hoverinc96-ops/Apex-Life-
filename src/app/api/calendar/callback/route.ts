@@ -3,16 +3,9 @@ import {
   calendarConfigured,
   exchangeCodeForTokens,
   isCalendarConnected,
+  siteOrigin,
   storeRefreshToken,
 } from "@/lib/google-calendar";
-
-function siteOrigin(request: NextRequest): string {
-  const proto = request.headers.get("x-forwarded-proto") ?? "http";
-  const host =
-    request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  return host ? `${proto}://${host}` : request.nextUrl.origin;
-}
-
 /**
  * GET /api/calendar/callback — OAuth callback for the ONE-TIME owner
  * connect. Exchanges the code for tokens and stores the refresh token
@@ -24,11 +17,9 @@ export async function GET(request: NextRequest) {
     NextResponse.redirect(
       new URL(`/dashboard/owner/calendar?connect=${reason}`, siteOrigin(request))
     );
-
   if (!calendarConfigured()) return fail("not_configured");
   const code = request.nextUrl.searchParams.get("code");
   if (!code) return fail("denied");
-
   try {
     const { refreshToken } = await exchangeCodeForTokens(
       code,
