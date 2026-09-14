@@ -23,6 +23,12 @@ function Navbar() {
             How It Works
           </a>
           <a
+            href="/get-quote"
+            className="text-sm font-medium text-slate-300 transition hover:text-gold-400"
+          >
+            Get a quote
+          </a>
+          <a
             href="#cta"
             className="rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-semibold text-navy-900 transition hover:bg-gold-400"
           >
@@ -59,6 +65,13 @@ function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               How It Works
+            </a>
+            <a
+              href="/get-quote"
+              className="text-sm font-medium text-slate-300"
+              onClick={() => setMobileOpen(false)}
+            >
+              Get a quote
             </a>
             <a
               href="#cta"
@@ -120,6 +133,16 @@ function Hero() {
             See How It Works
           </a>
         </div>
+        <p className="mt-8 text-sm text-slate-400">
+          Shopping for life insurance?{" "}
+          <a
+            href="/get-quote"
+            className="font-semibold text-gold-400 underline-offset-4 transition hover:text-gold-300 hover:underline"
+          >
+            Get a quote
+          </a>{" "}
+          — a few quick questions, plain answers, from a licensed agent.
+        </p>
 
         {/* Trust badges */}
         <div className="mt-16 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
@@ -452,6 +475,9 @@ function Footer() {
             </a>
             <a href="#how-it-works" className="transition hover:text-slate-300">
               How It Works
+            </a>
+            <a href="/get-quote" className="transition hover:text-slate-300">
+              Get a quote
             </a>
             <a href="#cta" className="transition hover:text-slate-300">
               Free Pilot
