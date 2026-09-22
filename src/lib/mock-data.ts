@@ -15,6 +15,9 @@ export interface Lead {
   coverage_amount_requested: number;
   health_notes: Record<string, unknown>;
   created_at: string;
+  /** Compliance surface (E1): true once a do-not-contact is recorded for this lead. */
+  do_not_contact?: boolean;
+  tcpa_consent?: boolean;
 }
 
 export type LeadStatus =
@@ -56,7 +59,7 @@ export interface Conversation {
 
 export interface TimelineEvent {
   id: string;
-  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote";
+  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote" | "dnc";
   title: string;
   description?: string;
   timestamp: string;

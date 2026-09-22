@@ -30,7 +30,7 @@ function cap(s: string): string {
 
 interface TimelineEvent {
   id: string;
-  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote";
+  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote" | "dnc";
   title: string;
   description?: string;
   timestamp: string;
@@ -130,6 +130,29 @@ async function buildTimeline(
       title: `Quote created — ${q.carrier_name}`,
       description: `${cap(String(q.policy_type).replace(/_/g, " "))}${coverage}`,
       timestamp: q.created_at as string,
+    });
+  }
+
+  // Do-not-contact entries (E1) — the compliance_dnc_list row is the source of
+  // truth, so every entry (owner-recorded or consumer, present or backfilled)
+  // shows up on the lead's timeline automatically.
+  const dncResult = await pool.query(
+    `SELECT id, channel, note, source, dnc_type, added_at
+       FROM compliance_dnc_list WHERE lead_id = $1
+      ORDER BY added_at ASC`,
+    [leadId]
+  );
+  for (const d of dncResult.rows) {
+    const bits: string[] = [];
+    if (d.channel) bits.push(`Via ${String(d.channel)}`);
+    if (d.note) bits.push(String(d.note).slice(0, 140));
+    events.push({
+      id: `evt-dnc-${d.id}`,
+      type: "dnc",
+      title: "Do not contact recorded",
+      description: bits.join(" — ") || `Suppression scope: ${String(d.dnc_type)}`,
+      timestamp: d.added_at as string,
+      meta: { channel: d.channel, source: d.source, dnc_type: d.dnc_type },
     });
   }
 

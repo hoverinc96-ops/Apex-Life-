@@ -132,6 +132,10 @@ export interface DncInput {
   email?: string | null;
   dnc_type?: "phone" | "email" | "both"; // default computed from provided channels
   source?: string; // e.g. web_opt_out | sms_stop | voice_opt_out | email_unsubscribe
+  /** How the "stop" reached us: email | phone | comment | other (E1 surface). */
+  channel?: string | null;
+  /** Optional free-text record of what the person said. */
+  note?: string | null;
 }
 
 export async function addToDnc(input: DncInput): Promise<string> {
@@ -144,8 +148,8 @@ export async function addToDnc(input: DncInput): Promise<string> {
     else dnc_type = "phone";
   }
   const res = await pool.query(
-    `INSERT INTO compliance_dnc_list (lead_id, phone, email, dnc_type, source)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO compliance_dnc_list (lead_id, phone, email, dnc_type, source, channel, note)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING id`,
     [
       input.lead_id ?? null,
@@ -153,6 +157,8 @@ export async function addToDnc(input: DncInput): Promise<string> {
       input.email?.trim() || null,
       dnc_type,
       input.source ?? "web_opt_out",
+      input.channel ?? null,
+      input.note?.trim() || null,
     ],
   );
   return res.rows[0].id;
@@ -184,8 +190,16 @@ export interface OptOutInput {
   lead_id?: string | null;
   phone?: string | null;
   email?: string | null;
-  channel?: string | null; // voice | sms | email | phone | all
+  channel?: string | null; // voice | sms | email | phone | all | comment | other
   source?: string | null;
+  /** Optional free-text record of what the person said (owner-recorded stops, E1). */
+  note?: string | null;
+  /**
+   * Optional explicit suppression scope. Callers that must suppress on every
+   * channel (e.g. an owner-recorded do-not-contact from the dashboard) pass
+   * "both"; otherwise the scope is derived from `channel`.
+   */
+  dnc_type?: "phone" | "email" | "both";
   ip_address?: string | null;
   user_agent?: string | null;
 }
@@ -198,7 +212,8 @@ export async function recordOptOut(input: OptOutInput): Promise<{
 }> {
   const hasPhone = Boolean(input.phone && input.phone.trim());
   const hasEmail = Boolean(input.email && input.email.trim());
-  const dncType = dncTypeForChannel(input.channel ?? undefined, hasPhone, hasEmail);
+  const dncType =
+    input.dnc_type ?? dncTypeForChannel(input.channel ?? undefined, hasPhone, hasEmail);
   const source = input.source ?? "web_opt_out";
 
   // 1. DNC suppression row (C3/C4)
@@ -208,6 +223,8 @@ export async function recordOptOut(input: OptOutInput): Promise<{
     email: input.email ?? null,
     dnc_type: dncType,
     source,
+    channel: input.channel ?? null,
+    note: input.note ?? null,
   });
 
   // 2. Cross-channel opt_out audit event
@@ -221,6 +238,7 @@ export async function recordOptOut(input: OptOutInput): Promise<{
         dnc_type: dncType,
         source,
         dnc_id: dncId,
+        note: input.note?.trim() || null,
         phone: input.phone ?? null,
         email: input.email ?? null,
       },
@@ -252,8 +270,12 @@ export async function recordOptOut(input: OptOutInput): Promise<{
     matchedLeadIds.push(...ids);
     if (ids.length > 0) {
       await pool.query(
-        `UPDATE leads SET tcpa_consent = FALSE, tcpa_consent_date = NULL, updated_at = CURRENT_TIMESTAMP
-         WHERE id = ANY($1::uuid[])`,
+        `UPDATE leads
+            SET tcpa_consent = FALSE,
+                tcpa_consent_date = NULL,
+                do_not_contact = TRUE,
+                updated_at = CURRENT_TIMESTAMP
+          WHERE id = ANY($1::uuid[])`,
         [ids],
       );
       await pool.query(

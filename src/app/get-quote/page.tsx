@@ -721,6 +721,11 @@ export default function GetQuotePage() {
                     ))}
                     <option value="__prefer_not">Prefer not to say</option>
                   </select>
+                  {/* Serve-state guard (traffic pack §6.3-3 / engineer item E3).
+                      Compliance-authored string — exact, do not reword. */}
+                  <p className="mt-1.5 text-[13px] font-medium text-slate-600">
+                    {`We're licensed to help in NJ, TX, FL, and MA. If you're somewhere else, we'll tell you honestly.`}
+                  </p>
                   <p className="mt-1 text-[13px] text-slate-500">
                     We&apos;ll use this to confirm we can serve you where you live.
                   </p>

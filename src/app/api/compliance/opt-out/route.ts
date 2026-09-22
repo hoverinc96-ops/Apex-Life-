@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { phone, email, channel, source, lead_id } = body;
+  const { phone, email, channel, source, lead_id, note, dnc_type } = body;
 
   const phoneStr = typeof phone === "string" ? phone.trim() : "";
   const emailStr = typeof email === "string" ? email.trim() : "";
@@ -51,6 +51,13 @@ export async function POST(request: NextRequest) {
       email: emailStr || null,
       channel: typeof channel === "string" ? channel : null,
       source: typeof source === "string" ? source : "web_opt_out",
+      // E1 owner-facing surface: optional note + explicit suppression scope.
+      // Both are absent on consumer opt-outs, so consumer behavior is unchanged.
+      note: typeof note === "string" ? note : null,
+      dnc_type:
+        dnc_type === "phone" || dnc_type === "email" || dnc_type === "both"
+          ? dnc_type
+          : undefined,
       ip_address: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
       user_agent: request.headers.get("user-agent"),
     });

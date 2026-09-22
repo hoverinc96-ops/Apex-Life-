@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/analytics", label: "Analytics", icon: "📊" },
   { href: "/dashboard/inbox", label: "Rep Handoff Inbox", icon: "📥" },
   { href: "/dashboard/team", label: "Team & Roles", icon: "👥" },
+  { href: "/dashboard/compliance", label: "Compliance", icon: "🛡️" },
   { href: "/dashboard/live-monitor", label: "Live Monitor", icon: "🔴" },
   { href: "/dashboard/voice-test", label: "Voice Test", icon: "🎙️" },
 ];

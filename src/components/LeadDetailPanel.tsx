@@ -24,6 +24,7 @@ const TIMELINE_ICONS: Record<TimelineEvent["type"], string> = {
   conversation: "💬",
   message: "📨",
   quote: "📄",
+  dnc: "🚫",
 };
 
 const fmtTimestamp = (iso: string): string =>
@@ -61,6 +62,16 @@ const STATUS_LABELS: Record<LeadStatus, string> = {
 
 type Tab = "quotes" | "conversations" | "timeline";
 
+/** How the "stop" reached us (E1). */
+type DncChannel = "email" | "phone" | "comment" | "other";
+
+const DNC_CHANNEL_OPTIONS: { value: DncChannel; label: string }[] = [
+  { value: "email", label: "Email" },
+  { value: "phone", label: "Phone" },
+  { value: "comment", label: "Comment / social" },
+  { value: "other", label: "Other" },
+];
+
 export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadDetailPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>("quotes");
   const [details, setDetails] = useState<DetailedLead | null>(null);
@@ -74,6 +85,14 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
   const [handoffBusy, setHandoffBusy] = useState(false);
   const [handoffError, setHandoffError] = useState<string | null>(null);
   const [handoffSuccessRep, setHandoffSuccessRep] = useState<string | null>(null);
+
+  // Do-not-contact state — owner-recorded opt-out (compliance item E1).
+  const [showDncDialog, setShowDncDialog] = useState(false);
+  const [dncChannel, setDncChannel] = useState<DncChannel>("email");
+  const [dncNote, setDncNote] = useState("");
+  const [dncBusy, setDncBusy] = useState(false);
+  const [dncError, setDncError] = useState<string | null>(null);
+  const [dncSuccess, setDncSuccess] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -109,12 +128,19 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
   const timeline = details?.timeline ?? [];
   const healthEntries = Object.entries(displayLead.health_notes as Record<string, unknown>);
 
+  // ── Contact affordances (E1) ────────────────────────────────────────
+  // A do-not-contact lead is suppressed on every channel: the handoff
+  // affordance (which queues a rep to contact them) is hidden, and any
+  // current or future call / email / SMS affordance must gate on this flag.
+  const isDoNotContact = Boolean(displayLead.do_not_contact);
+
   // ── Handoff affordance ──────────────────────────────────────────────
   // A lead can be handed off only before it's already queued for a live
   // handoff or otherwise worked past that point (not new, not handed off,
   // not closed). This is a CONTEXT TRANSFER — no live phone call is routed.
   const PRE_HANDOFF_STATUSES: LeadStatus[] = ["qualified", "proposal_sent", "in_negotiation"];
-  const isHandoffEligible = PRE_HANDOFF_STATUSES.includes(displayLead.status);
+  const isHandoffEligible =
+    PRE_HANDOFF_STATUSES.includes(displayLead.status) && !isDoNotContact;
   const alreadyHandedOff = displayLead.status === "pending_live_handoff";
   const assignedRepId = (displayLead as unknown as Record<string, unknown>).assigned_rep_id as string | null | undefined;
   const assignedRepName = assignedRepId
@@ -154,6 +180,47 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
       setHandoffError(err instanceof Error ? err.message : "Unable to hand off lead");
     } finally {
       setHandoffBusy(false);
+    }
+  };
+
+  // Record the do-not-contact: writes the DNC entry, revokes consent, marks
+  // the lead (do_not_contact), and adds a Timeline entry — all server-side
+  // via POST /api/compliance/opt-out. A stop is final on every channel.
+  const handleDnc = async () => {
+    setDncBusy(true);
+    setDncError(null);
+    try {
+      const res = await fetch("/api/compliance/opt-out", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lead_id: lead.id,
+          phone: displayLead.phone || null,
+          email: displayLead.email || null,
+          channel: dncChannel,
+          source: "dashboard_owner_action",
+          note: dncNote.trim() || null,
+          dnc_type: "both",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Unable to record do-not-contact");
+      setDncSuccess(true);
+      setShowDncDialog(false);
+      // Refresh the panel so the suppression banner + timeline entry appear.
+      setLoading(true);
+      fetch(`/api/leads/${lead.id}`, { cache: "no-store" })
+        .then(async (response) => {
+          if (!response.ok) throw new Error("Unable to refresh lead details");
+          return response.json();
+        })
+        .then((d: DetailedLead) => setDetails(d))
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    } catch (err) {
+      setDncError(err instanceof Error ? err.message : "Unable to record do-not-contact");
+    } finally {
+      setDncBusy(false);
     }
   };
 
@@ -261,6 +328,41 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
                 ))}
               </select>
             </div>
+
+            {/* Do not contact (compliance item E1) */}
+            {isDoNotContact ? (
+              <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-red-400">
+                  🚫 Do not contact
+                </p>
+                <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+                  {dncSuccess
+                    ? "Recorded. "
+                    : ""}
+                  This contact asked us to stop. Their phone and email are on the do-not-contact
+                  list, consent is revoked, and all contact — call, email, SMS, or handoff — is
+                  suppressed on every channel.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-lg border border-navy-700/40 bg-navy-800/40 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-semibold text-slate-200">Do not contact</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">
+                      The contact asked to stop — by email, phone, a comment, or any channel.
+                      Records the opt-out, revokes consent, and suppresses this lead permanently.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setShowDncDialog(true); setDncError(null); }}
+                    className="shrink-0 rounded-lg border border-red-500/50 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-500/20"
+                  >
+                    Do not contact
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Hand off to rep */}
             {alreadyHandedOff ? (
@@ -487,6 +589,90 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
           </div>
         </div>
       </div>
+
+      {/* Do-not-contact confirm dialog (E1) */}
+      {showDncDialog && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Record do-not-contact"
+            className="w-full max-w-md rounded-xl border border-navy-600 bg-navy-800 p-6"
+          >
+            <h3 className="text-lg font-bold text-white">Record do-not-contact?</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              This adds{" "}
+              <span className="font-medium text-slate-200">
+                {displayLead.first_name} {displayLead.last_name}
+              </span>{" "}
+              to the do-not-contact list, revokes their consent, and suppresses every contact
+              affordance for this lead. A stop is final on every channel — this cannot be undone
+              from the dashboard.
+            </p>
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <label
+                  htmlFor="dnc-channel"
+                  className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-slate-400"
+                >
+                  How did the &ldquo;stop&rdquo; reach us?
+                </label>
+                <select
+                  id="dnc-channel"
+                  value={dncChannel}
+                  onChange={(e) => setDncChannel(e.target.value as DncChannel)}
+                  className="w-full rounded-lg border border-navy-600 bg-navy-900 px-3 py-2 text-sm text-slate-200 outline-none transition focus:border-gold-500"
+                >
+                  {DNC_CHANNEL_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="dnc-note"
+                  className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-slate-400"
+                >
+                  Note <span className="normal-case text-slate-500">(optional — what they said)</span>
+                </label>
+                <textarea
+                  id="dnc-note"
+                  rows={3}
+                  value={dncNote}
+                  onChange={(e) => setDncNote(e.target.value)}
+                  placeholder='e.g. &quot;Please stop emailing me&quot; — reply to follow-up, Mar 2'
+                  className="w-full resize-none rounded-lg border border-navy-600 bg-navy-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-600 outline-none transition focus:border-gold-500"
+                />
+              </div>
+              {dncError && (
+                <p className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400">
+                  {dncError}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => { setShowDncDialog(false); setDncError(null); }}
+                disabled={dncBusy}
+                className="rounded-lg border border-navy-600 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-navy-700 disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDnc}
+                disabled={dncBusy}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-500 disabled:opacity-60"
+              >
+                {dncBusy ? "Recording…" : "Record do-not-contact"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
