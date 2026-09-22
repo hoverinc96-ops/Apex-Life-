@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import CarrierStrip from "@/components/CarrierStrip";
+
 // ── Navbar ──────────────────────────────────────────────────────────────────
 function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -502,6 +504,7 @@ export default function Home() {
         <Hero />
         <Features />
         <HowItWorks />
+        <CarrierStrip />
         <Pilot />
         <CTA />
       </main>
