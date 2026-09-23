@@ -570,7 +570,7 @@ export default function GetQuotePage() {
     <div className="step-enter text-center">
       <div className="mb-2 flex items-center justify-center gap-2 text-lg font-bold text-navy-900">
         <span className="text-gold-500">◆</span>
-        <span>Apex Life AI</span>
+        <span>Apex Life</span>
       </div>
       <h1
         ref={headingRef}
@@ -1065,12 +1065,12 @@ export default function GetQuotePage() {
             className="flex items-center gap-2 text-sm font-bold text-navy-900"
           >
             <span className="text-lg text-gold-500">◆</span>
-            Apex Life AI
+            Apex Life
           </a>
         ) : (
           <span className="flex items-center gap-2 text-sm font-bold text-navy-900">
             <span className="text-lg text-gold-500">◆</span>
-            Apex Life AI
+            Apex Life
           </span>
         )}
         {step === INTRO || step === SUCCESS ? (

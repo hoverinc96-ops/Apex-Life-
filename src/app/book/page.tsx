@@ -85,7 +85,7 @@ export default function BookPage() {
 
         <div className="mb-2 flex items-center gap-2 text-lg font-bold">
           <span className="text-gold-500">◆</span>
-          <span>Apex Life AI</span>
+          <span>Apex Life</span>
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
           Request a call

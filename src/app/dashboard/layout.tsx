@@ -30,7 +30,7 @@ export default function DashboardLayout({
         {/* Logo */}
         <div className="flex items-center gap-2 border-b border-navy-700/50 px-5 py-4">
           <span className="text-gold-500 text-lg">◆</span>
-          <span className="text-sm font-bold tracking-tight">Apex Life AI</span>
+          <span className="text-sm font-bold tracking-tight">Apex Life</span>
         </div>
 
         {/* Nav */}
