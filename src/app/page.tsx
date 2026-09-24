@@ -468,7 +468,7 @@ function Footer() {
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex items-center gap-2 text-lg font-bold">
             <span className="text-gold-500">◆</span>
-            <span>Apex Life AI</span>
+            <span>Apex Life</span>
           </div>
 
           <div className="flex gap-8 text-sm text-slate-500">
@@ -487,7 +487,7 @@ function Footer() {
           </div>
 
           <p className="text-xs text-slate-600">
-            &copy; {new Date().getFullYear()} Apex Life AI. All rights reserved.
+            &copy; {new Date().getFullYear()} Apex Life. All rights reserved.
           </p>
         </div>
       </div>
