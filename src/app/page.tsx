@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import CarrierStrip from "@/components/CarrierStrip";
+import WelcomeGate from "@/components/WelcomeGate";
 
 // ── Navbar ──────────────────────────────────────────────────────────────────
 function Navbar() {
@@ -499,6 +500,7 @@ function Footer() {
 export default function Home() {
   return (
     <>
+      <WelcomeGate />
       <Navbar />
       <main>
         <Hero />
