@@ -1061,7 +1061,7 @@ export default function GetQuotePage() {
       <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 pb-2 pt-5 sm:px-6">
         {step === INTRO || step === SUCCESS ? (
           <a
-            href="/"
+            href="/?welcome=1"
             className="flex items-center gap-2 text-sm font-bold text-navy-900"
           >
             <span className="text-lg text-gold-500">◆</span>

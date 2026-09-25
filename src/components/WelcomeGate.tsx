@@ -10,12 +10,17 @@ export default function WelcomeGate() {
 
   useEffect(() => {
     let seen = false;
+    let forced = false;
     try {
       seen = window.sessionStorage.getItem(STORAGE_KEY) === "1";
+      forced = new URLSearchParams(window.location.search).get("welcome") === "1";
     } catch {
       seen = false;
     }
-    if (!seen) setShow(true);
+    if (!seen || forced) setShow(true);
+    const open = () => setShow(true);
+    window.addEventListener("apex:open-welcome", open);
+    return () => window.removeEventListener("apex:open-welcome", open);
   }, []);
 
   useEffect(() => {

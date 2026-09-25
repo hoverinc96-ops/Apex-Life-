@@ -12,7 +12,14 @@ function Navbar() {
   return (
     <nav className="fixed top-0 z-50 w-full border-b border-navy-700/50 bg-navy-900/80 backdrop-blur-lg">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <a href="#" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent("apex:open-welcome"));
+          }}
+          className="flex items-center gap-2 text-xl font-bold tracking-tight"
+        >
           <span className="text-gold-500">◆</span>
           <span>Apex Life</span>
         </a>
