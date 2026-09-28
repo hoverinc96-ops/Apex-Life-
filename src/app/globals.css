@@ -25,3 +25,47 @@ body { background-color: var(--color-navy-900); color: #ffffff; font-family: var
   .step-enter { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ── Light agent-workspace theme (dashboard interior ONLY) ────────────────
+   The dashboard pages were originally styled dark with navy/slate tokens.
+   Tailwind v4 compiles utilities like bg-navy-800 to var(--color-navy-800),
+   so remapping those CSS variables inside the .dash-light scope re-themes
+   every legacy dashboard page to the light workspace without touching each
+   file. New light-theme pages use explicit slate classes and are unaffected.
+   The public site (dark navy) renders outside .dash-light and keeps its look. */
+.dash-light {
+  --color-navy-900: #ffffff;
+  --color-navy-800: #f8fafc;
+  --color-navy-700: #e2e8f0;
+  --color-navy-600: #cbd5e1;
+  /* slate-300+ tokens flip role: they were light text on dark, now dark on light.
+     slate-100/200 are NOT remapped — legacy pages use them for borders, and the
+     light-text uses are flipped by class rules below instead. */
+  --color-slate-300: #1e293b;
+  --color-slate-400: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-600: #64748b;
+  /* darker golds for text contrast on white; gold-500 stays the button accent */
+  --color-gold-300: #8a6a15;
+  --color-gold-400: #a17c1e;
+  /* status/feedback text that was tuned for dark surfaces */
+  --color-emerald-300: #047857;
+  --color-rose-300: #be123c;
+}
+/* Solid gold buttons keep navy text (navy-900 remapped to white above). */
+.dash-light .bg-gold-500,
+.dash-light .bg-gold-400 {
+  color: #0a1628;
+}
+/* White and near-white text was tuned for dark surfaces; flip it to dark —
+   except on solid red/rose action buttons (take-over / delete), which keep
+   white text. */
+.dash-light
+  :not(.bg-red-600):not(.bg-rose-500):not(.bg-rose-600):not(.bg-rose-500\/90).text-white {
+  color: #0f172a;
+}
+.dash-light .text-slate-100,
+.dash-light .text-slate-200,
+.dash-light .hover\:text-slate-100:hover {
+  color: #0f172a;
+}
