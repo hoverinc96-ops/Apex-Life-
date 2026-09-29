@@ -273,7 +273,7 @@ export default function VoiceTestPage() {
           <button
             onClick={simulateCall}
             disabled={busy || isRecording}
-            className="rounded-lg bg-gold-500 px-6 py-3 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             ▶ Simulate call
           </button>

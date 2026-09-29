@@ -101,7 +101,7 @@ export default function ImportLeadsPanel({
                 type="button"
                 onClick={handleImport}
                 disabled={importing}
-                className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {importing ? "Importing…" : "Import"}
               </button>

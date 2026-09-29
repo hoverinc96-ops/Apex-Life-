@@ -54,7 +54,7 @@ export default function KanbanBoard({ refreshKey = 0 }: { refreshKey?: number })
   };
 
   if (loading) return <div className="flex flex-1 items-center justify-center text-slate-400"><Spinner /> <span className="ml-3">Loading leads...</span></div>;
-  if (error) return <div className="flex flex-1 flex-col items-center justify-center text-red-400"><p>{error}</p><button onClick={fetchLeads} className="mt-3 rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900">Try again</button></div>;
+  if (error) return <div className="flex flex-1 flex-col items-center justify-center text-red-400"><p>{error}</p><button onClick={fetchLeads} className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Try again</button></div>;
 
   return <>
     <div className="flex-1 overflow-x-auto"><div className="flex h-full min-w-max gap-4 p-6">

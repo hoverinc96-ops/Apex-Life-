@@ -177,7 +177,7 @@ export default function OwnerCalendarPage() {
                 <button
                   onClick={connect}
                   disabled={connecting}
-                  className="mt-2 rounded-xl bg-gold-500 px-5 py-3 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                  className="mt-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
                 >
                   {connecting ? "Starting…" : "Connect Google Calendar"}
                 </button>

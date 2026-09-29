@@ -40,7 +40,7 @@ function Navbar() {
           </a>
           <a
             href="#cta"
-            className="rounded-lg bg-gold-500 px-5 py-2.5 text-sm font-semibold text-navy-900 transition hover:bg-gold-400"
+            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
           >
             Start a Free 60-Day Pilot
           </a>
@@ -85,7 +85,7 @@ function Navbar() {
             </a>
             <a
               href="#cta"
-              className="rounded-lg bg-gold-500 px-5 py-2.5 text-center text-sm font-semibold text-navy-900"
+              className="rounded-lg bg-emerald-600 px-5 py-2.5 text-center text-sm font-semibold text-white"
               onClick={() => setMobileOpen(false)}
             >
               Start a Free 60-Day Pilot
@@ -132,7 +132,7 @@ function Hero() {
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
             href="#cta"
-            className="rounded-xl bg-gold-500 px-8 py-4 text-base font-bold text-navy-900 shadow-lg shadow-gold-500/20 transition hover:bg-gold-400"
+            className="rounded-xl bg-emerald-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700"
           >
             Start a Free 60-Day Pilot →
           </a>
@@ -446,7 +446,7 @@ function CTA() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-gold-500 px-6 py-4 font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+              className="w-full rounded-xl bg-emerald-600 px-6 py-4 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
             >
               {submitting ? "Submitting…" : "Start My Free Pilot"}
             </button>

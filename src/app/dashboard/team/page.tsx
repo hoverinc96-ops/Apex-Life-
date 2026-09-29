@@ -114,7 +114,7 @@ export default function TeamPage() {
               <p className="text-sm text-red-400">{error}</p>
               <button
                 onClick={fetchMembers}
-                className="mt-3 rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900"
+                className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
               >
                 Try again
               </button>
@@ -217,7 +217,7 @@ export default function TeamPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-lg bg-gold-500 px-4 py-2.5 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
               >
                 {submitting ? "Adding..." : "Add member"}
               </button>
