@@ -6,6 +6,7 @@ import {
   recordConsent,
   type ComplianceChannel,
 } from "@/lib/compliance";
+import { attributionValueOrNull } from "@/lib/attribution";
 
 /** Extract a client IP from common proxy headers; falls back to null. */
 function clientIp(request: NextRequest): string | null {
@@ -158,6 +159,18 @@ export async function POST(request: NextRequest) {
   const policyPreference = optionalString(body.policy_preference);
   if (policyPreference) healthNotes.policy_preference = policyPreference;
 
+  // E4 attribution — optional & lenient: absent/wrong-typed values persist as
+  // NULL. We never invent attribution (no defaults, no referrer guessing);
+  // whatever the wizard captured from the entry URL is stored verbatim.
+  const utmSource = attributionValueOrNull(body.utm_source);
+  const utmMedium = attributionValueOrNull(body.utm_medium);
+  const utmCampaign = attributionValueOrNull(body.utm_campaign);
+  const utmContent = attributionValueOrNull(body.utm_content);
+  const utmTerm = attributionValueOrNull(body.utm_term);
+  const fbclid = attributionValueOrNull(body.fbclid);
+  const gclid = attributionValueOrNull(body.gclid);
+  const msclkid = attributionValueOrNull(body.msclkid);
+
   const ipAddress = clientIp(request);
   const userAgent = request.headers.get("user-agent");
 
@@ -183,15 +196,21 @@ export async function POST(request: NextRequest) {
       `INSERT INTO leads (
          first_name, last_name, email, phone, state, status, source, owner_only,
          tobacco_user, coverage_amount_requested, health_notes, age_range, term_years,
-         tcpa_consent, tcpa_consent_date
+         tcpa_consent, tcpa_consent_date,
+         utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+         fbclid, gclid, msclkid
        ) VALUES (
          $1, $2, $3, $4, $5, 'new', 'consumer_inquiry', TRUE,
          $6, $7, $8, $9, $10,
-         TRUE, CURRENT_TIMESTAMP
+         TRUE, CURRENT_TIMESTAMP,
+         $11, $12, $13, $14, $15,
+         $16, $17, $18
        )
        RETURNING id, first_name, last_name, email, phone, state, status, source, owner_only,
                  tobacco_user, coverage_amount_requested, health_notes, age_range, term_years,
-                 tcpa_consent, tcpa_consent_date, created_at`,
+                 tcpa_consent, tcpa_consent_date, created_at,
+                 utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+                 fbclid, gclid, msclkid`,
       [
         first_name,
         last_name,
@@ -203,6 +222,14 @@ export async function POST(request: NextRequest) {
         JSON.stringify(healthNotes),
         ageRange,
         termYears,
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmContent,
+        utmTerm,
+        fbclid,
+        gclid,
+        msclkid,
       ]
     );
 
