@@ -5,6 +5,7 @@ import KanbanBoard from "@/components/KanbanBoard";
 import LeadDetailPanel from "@/components/LeadDetailPanel";
 import { Lead, LeadStatus } from "@/lib/mock-data";
 import { CLIENT_STATUS_META, CLIENT_STATUS_ORDER, formatAddedDate, sourceLabel } from "@/lib/status";
+import { attributionChipLabel } from "@/lib/attribution";
 
 type ViewMode = "table" | "pipeline";
 
@@ -218,7 +219,18 @@ export default function ClientsPage() {
                             <td className="whitespace-nowrap px-5 py-3 text-slate-600">{lead.email}</td>
                             <td className="whitespace-nowrap px-5 py-3 text-slate-600">{lead.phone}</td>
                             <td className="px-5 py-3 text-slate-600">{lead.state}</td>
-                            <td className="whitespace-nowrap px-5 py-3 text-slate-600">{sourceLabel(lead.source)}</td>
+                            <td className="whitespace-nowrap px-5 py-3 text-slate-600">
+                              {sourceLabel(lead.source)}
+                              {/* E4 — attribution chip, only when something was captured */}
+                              {(() => {
+                                const attr = attributionChipLabel(lead);
+                                return attr ? (
+                                  <span className="ml-1.5 inline-flex whitespace-nowrap rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                                    {attr}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </td>
                             <td className="px-5 py-3">
                               <span
                                 className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${

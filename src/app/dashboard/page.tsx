@@ -8,6 +8,7 @@ import AddLeadModal from "@/components/AddLeadModal";
 import ShareLinkModal from "@/components/ShareLinkModal";
 import { Lead } from "@/lib/mock-data";
 import { CLIENT_STATUS_META, formatAddedDate, sourceLabel } from "@/lib/status";
+import { attributionChipLabel } from "@/lib/attribution";
 
 type KpiValue = number | null;
 
@@ -244,7 +245,18 @@ export default function DashboardHomePage() {
                               </span>
                             )}
                           </td>
-                          <td className="px-5 py-3 text-slate-600">{sourceLabel(lead.source)}</td>
+                          <td className="px-5 py-3 text-slate-600">
+                            {sourceLabel(lead.source)}
+                            {/* E4 — attribution chip, only when something was captured */}
+                            {(() => {
+                              const attr = attributionChipLabel(lead);
+                              return attr ? (
+                                <span className="ml-1.5 inline-flex whitespace-nowrap rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-800">
+                                  {attr}
+                                </span>
+                              ) : null;
+                            })()}
+                          </td>
                           <td className="px-5 py-3">
                             <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${meta?.badge ?? "border-slate-200 bg-slate-50 text-slate-700"}`}>
                               {meta?.label ?? lead.status}

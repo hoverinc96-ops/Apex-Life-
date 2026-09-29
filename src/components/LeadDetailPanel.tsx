@@ -11,6 +11,7 @@ import {
   getScoreColor,
 } from "@/lib/mock-data";
 import { TeamMember } from "@/lib/team-types";
+import { formatAttribution, hasAttribution } from "@/lib/attribution";
 
 type DetailedLead = Lead & {
   quotes: Quote[];
@@ -292,6 +293,33 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
                 <p className="text-xs text-slate-500">Tobacco</p>
                 <p className="text-slate-200">{displayLead.tobacco_user ? "Yes" : "No"}</p>
               </div>
+            </div>
+
+            {/* Attribution (E4) — where this lead came from, or an honest
+                "direct" when nothing was captured. Older leads pre-date
+                capture and also show the direct line (nulls, never a crash). */}
+            <div className="mt-4 rounded-lg border border-navy-700/30 bg-navy-800/50 p-3">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-slate-400">
+                Attribution
+              </p>
+              <p
+                className={
+                  hasAttribution(displayLead)
+                    ? "text-xs font-medium text-emerald-700"
+                    : "text-xs text-slate-400"
+                }
+              >
+                {formatAttribution(displayLead)}
+              </p>
+              {hasAttribution(displayLead) &&
+                (displayLead.utm_content || displayLead.utm_term) && (
+                  <p className="mt-1 text-xs text-slate-300">
+                    <span className="text-slate-500">Detail: </span>
+                    {[displayLead.utm_content, displayLead.utm_term]
+                      .filter((v): v is string => Boolean(v))
+                      .join(" · ")}
+                  </p>
+                )}
             </div>
 
             {/* Health notes */}

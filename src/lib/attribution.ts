@@ -118,3 +118,20 @@ export function attributionValueOrNull(v: unknown, max = ATTRIBUTION_MAX_LEN): s
   const s = v.trim().slice(0, max);
   return s.length > 0 ? s : null;
 }
+
+/**
+ * Compact chip label for pipeline/clients surfaces: the captured utm_source,
+ * else the captured click-ID param name; null when nothing was captured
+ * (chips render "Direct" instead). Never invents a value — it only relabels
+ * what was actually captured.
+ */
+export function attributionChipLabel(
+  a: Partial<Attribution> | null | undefined
+): string | null {
+  if (!a) return null;
+  if (a.utm_source) return a.utm_source;
+  if (a.fbclid) return "fbclid";
+  if (a.gclid) return "gclid";
+  if (a.msclkid) return "msclkid";
+  return null;
+}
