@@ -45,23 +45,45 @@ body { background-color: var(--color-navy-900); color: #ffffff; font-family: var
   --color-slate-400: #475569;
   --color-slate-500: #64748b;
   --color-slate-600: #64748b;
-  /* darker golds for text contrast on white; gold-500 stays the button accent */
-  --color-gold-300: #8a6a15;
-  --color-gold-400: #a17c1e;
+  /* ── Palette v4 (2026-09-22, FINAL): green/white/gold. ──────────────
+     gold → bright amber-500 #f59e0b (the ◆ diamond, soft chips, featured
+     badges — flourish only, never buttons); darker ambers for gold-as-text
+     contrast on white. navy-* stays remapped to white/slate surfaces. */
+  --color-gold-500: #f59e0b;
+  --color-gold-400: #b45309;
+  --color-gold-300: #92400e;
+  --color-gold-200: #92400e;
   /* status/feedback text that was tuned for dark surfaces */
   --color-emerald-300: #047857;
   --color-rose-300: #be123c;
 }
-/* Solid gold buttons keep navy text (navy-900 remapped to white above). */
-.dash-light .bg-gold-500,
+/* v4: ONE button color — emerald-600 with white text, hover emerald-700.
+   Legacy solid-gold buttons (inbox, team, calendar, kanban, lead panel)
+   map here automatically. Opacity variants (bg-gold-500/10 etc.) are
+   distinct classes and keep their amber tint as flourish accents. */
+.dash-light .bg-gold-500 {
+  background-color: #059669;
+  color: #ffffff;
+}
+.dash-light .hover\:bg-gold-400:hover {
+  background-color: #047857;
+}
+/* Solid amber bar (analytics chart series) — bright gold flourish. */
 .dash-light .bg-gold-400 {
-  color: #0a1628;
+  background-color: #f59e0b;
+}
+/* v4: dashboard headings are deep green (emerald-950), everywhere the
+   heading doesn't sit on a colored surface. */
+.dash-light h1:not(.text-white),
+.dash-light h2:not(.text-white),
+.dash-light h3:not(.text-white) {
+  color: #022c22;
 }
 /* White and near-white text was tuned for dark surfaces; flip it to dark —
-   except on solid red/rose action buttons (take-over / delete), which keep
-   white text. */
+   except on solid action buttons that keep white text: red/rose (take-over /
+   delete) and emerald-600 (v4 primary). */
 .dash-light
-  :not(.bg-red-600):not(.bg-rose-500):not(.bg-rose-600):not(.bg-rose-500\/90).text-white {
+  :not(.bg-red-600):not(.bg-rose-500):not(.bg-rose-600):not(.bg-rose-500\/90):not(.bg-emerald-600).text-white {
   color: #0f172a;
 }
 .dash-light .text-slate-100,

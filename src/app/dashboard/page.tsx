@@ -109,8 +109,9 @@ export default function DashboardHomePage() {
       <div className="mx-auto max-w-7xl p-6 lg:p-8">
         {/* ── Greeting ─────────────────────────────────────────────────── */}
         <header>
-          <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
+          <h2 className="text-2xl font-bold text-emerald-950">Welcome back</h2>
           <p className="mt-1 text-sm text-slate-500">{today || "\u00a0"}</p>
+          <div className="mt-3 h-0.5 w-10 rounded-full bg-amber-500" aria-hidden="true" />
         </header>
 
         {/* ── Quick actions ────────────────────────────────────────────── */}
@@ -118,9 +119,9 @@ export default function DashboardHomePage() {
           <button
             type="button"
             onClick={() => setAddOpen(true)}
-            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-gold-500/50"
+            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500/15 text-base">＋</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">＋</span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Add lead</span>
               <span className="block text-xs text-slate-500">Enter a contact by hand</span>
@@ -130,9 +131,9 @@ export default function DashboardHomePage() {
             type="button"
             onClick={() => setCsvOpen((v) => !v)}
             aria-expanded={csvOpen}
-            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-gold-500/50"
+            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500/15 text-base">📄</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">📄</span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Import CSV</span>
               <span className="block text-xs text-slate-500">Bulk-upload your lead list</span>
@@ -141,9 +142,9 @@ export default function DashboardHomePage() {
           <button
             type="button"
             onClick={() => setShareOpen(true)}
-            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-gold-500/50"
+            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500/15 text-base">🔗</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">🔗</span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Share quote link</span>
               <span className="block text-xs text-slate-500">Send people to your quote form</span>
@@ -151,9 +152,9 @@ export default function DashboardHomePage() {
           </button>
           <Link
             href="/dashboard/compliance"
-            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-gold-500/50"
+            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500/15 text-base">🛡️</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">🛡️</span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Do-not-contact registry</span>
               <span className="block text-xs text-slate-500">Review opt-outs and consent</span>
@@ -170,7 +171,7 @@ export default function DashboardHomePage() {
 
         {/* ── KPI strip ────────────────────────────────────────────────── */}
         <section className="mt-8">
-          <h3 className="text-sm font-semibold text-slate-900">Pilot KPIs</h3>
+          <h3 className="text-sm font-semibold text-emerald-950">Pilot KPIs</h3>
           <p className="mt-0.5 text-xs text-slate-500">
             The five metrics reviewed in weekly pilot check-ins — computed live, never estimated to
             look complete.
@@ -201,12 +202,12 @@ export default function DashboardHomePage() {
           <section className="rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">Recent clients</h3>
+                <h3 className="text-sm font-semibold text-emerald-950">Recent clients</h3>
                 <p className="mt-0.5 text-xs text-slate-500">Newest first — click a row to open the full record.</p>
               </div>
               <Link
                 href="/dashboard/clients"
-                className="text-xs font-medium text-gold-400 underline-offset-2 hover:text-gold-300 hover:underline"
+                className="text-xs font-semibold text-emerald-600 underline-offset-2 hover:text-emerald-700 hover:underline"
               >
                 View all
               </Link>
@@ -264,7 +265,7 @@ export default function DashboardHomePage() {
           {/* ── Compensation + resources ───────────────────────────────── */}
           <div className="space-y-6">
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="text-sm font-semibold text-slate-900">Compensation</h3>
+              <h3 className="text-sm font-semibold text-emerald-950">Compensation</h3>
               <div className="mt-3 text-3xl font-bold text-slate-900">$0</div>
               <p className="mt-1 text-sm text-slate-600">No payouts recorded yet</p>
               <p className="mt-3 text-xs text-slate-500">
@@ -273,11 +274,11 @@ export default function DashboardHomePage() {
             </section>
 
             <section>
-              <h3 className="text-sm font-semibold text-slate-900">Resources</h3>
+              <h3 className="text-sm font-semibold text-emerald-950">Resources</h3>
               <p className="mt-0.5 text-xs text-slate-500">Compliance-reviewed materials.</p>
               <div className="mt-3 space-y-3">
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                  <p className="text-sm font-semibold text-slate-900">Outreach starter pack</p>
+                  <p className="text-sm font-semibold text-emerald-950">Outreach starter pack</p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-600">
                     Six organic post drafts and one paid-ad concept for your quote funnel — every
                     line checked against the do-not-say list. Ready to post from your own accounts
@@ -286,30 +287,38 @@ export default function DashboardHomePage() {
                 </div>
                 <Link
                   href="/dashboard/compliance"
-                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-gold-500/50"
+                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-300"
                 >
-                  <p className="text-sm font-semibold text-slate-900">Compliance vault</p>
+                  <p className="text-sm font-semibold text-emerald-950">Compliance vault</p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-600">
                     Consent records, the do-not-contact list, and the audit trail.
                   </p>
                 </Link>
                 <Link
+                  href="/dashboard/compliance"
+                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-300"
+                >
+                  <p className="text-sm font-semibold text-emerald-950">Do-not-contact registry</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                    Every opt-out on record — searchable, permanent, honored on every channel.
+                  </p>
+                </Link>
+                <Link
                   href="/book"
                   target="_blank"
-                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-gold-500/50"
+                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-300"
                 >
-                  <p className="text-sm font-semibold text-slate-900">Booking page</p>
+                  <p className="text-sm font-semibold text-emerald-950">Booking page</p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-600">
-                    Your call-request form — requests land in your bookings and you confirm by
-                    email.
+                    Your call-request form — requests land in your bookings for you to confirm.
                   </p>
                 </Link>
                 <Link
                   href="/get-quote"
                   target="_blank"
-                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-gold-500/50"
+                  className="block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-emerald-300"
                 >
-                  <p className="text-sm font-semibold text-slate-900">Quote form</p>
+                  <p className="text-sm font-semibold text-emerald-950">Quote form</p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-600">
                     Preview the form your shared link opens.
                   </p>

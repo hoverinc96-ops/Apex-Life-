@@ -48,8 +48,8 @@ export default function DashboardLayout({
       <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
         {/* Logo */}
         <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
-          <span className="text-lg text-gold-500">◆</span>
-          <span className="text-sm font-bold tracking-tight text-slate-900">Apex Life</span>
+          <span className="text-lg text-amber-500">◆</span>
+          <span className="text-sm font-bold tracking-tight text-emerald-950">Apex Life</span>
         </div>
 
         {/* Nav */}
@@ -62,7 +62,7 @@ export default function DashboardLayout({
                 href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
                   isActive
-                    ? "bg-gold-500/10 font-medium text-gold-400"
+                    ? "bg-emerald-50 font-medium text-emerald-700"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
@@ -76,7 +76,7 @@ export default function DashboardLayout({
         {/* Bottom user */}
         <div className="border-t border-slate-200 px-5 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/20 text-sm font-semibold text-gold-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-sm font-semibold text-emerald-700">
               AS
             </div>
             <div className="min-w-0 flex-1">
@@ -92,13 +92,13 @@ export default function DashboardLayout({
         {/* Top bar */}
         <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3">
           <div>
-            <h1 className="text-sm font-semibold text-slate-900">{pageTitle(pathname)}</h1>
+            <h1 className="text-sm font-semibold text-emerald-950">{pageTitle(pathname)}</h1>
           </div>
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setShareOpen(true)}
-              className="rounded-lg bg-gold-500 px-3.5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-gold-400"
+              className="rounded-lg bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               Share quote link
             </button>
@@ -106,7 +106,7 @@ export default function DashboardLayout({
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               System Active
             </span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0a1628] text-sm font-semibold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-950 text-sm font-semibold text-white">
               AS
             </div>
           </div>

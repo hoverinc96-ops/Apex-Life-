@@ -70,7 +70,7 @@ export default function ClientsPage() {
       {/* ── Header + view toggle ───────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900">Clients</h2>
+          <h2 className="text-base font-bold text-emerald-950">Clients</h2>
           <p className="mt-0.5 text-xs text-slate-500">
             Everyone in your pipeline, at every stage.
           </p>
@@ -125,7 +125,7 @@ export default function ClientsPage() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search name, email, phone, state…"
                   aria-label="Search clients"
-                  className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-gold-500 focus:outline-none focus:ring-1 focus:ring-gold-500"
+                  className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -134,7 +134,7 @@ export default function ClientsPage() {
                   onClick={() => setStatusFilter("all")}
                   className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                     statusFilter === "all"
-                      ? "border-slate-900 bg-slate-900 text-white"
+                      ? "border-emerald-300 bg-emerald-100 text-emerald-900"
                       : "border-slate-200 bg-white text-slate-600 hover:border-slate-400"
                   }`}
                 >
@@ -152,7 +152,7 @@ export default function ClientsPage() {
                       aria-pressed={active}
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
                         active
-                          ? "border-slate-900 bg-slate-900 text-white"
+                          ? "border-emerald-300 bg-emerald-100 text-emerald-900"
                           : "border-slate-200 bg-white text-slate-600 hover:border-slate-400"
                       }`}
                     >
@@ -173,7 +173,7 @@ export default function ClientsPage() {
                   <button
                     type="button"
                     onClick={fetchLeads}
-                    className="mt-3 rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-slate-900"
+                    className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
                   >
                     Try again
                   </button>

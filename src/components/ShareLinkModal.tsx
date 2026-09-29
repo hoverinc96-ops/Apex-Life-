@@ -58,7 +58,7 @@ export default function ShareLinkModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-base font-semibold text-slate-900">Share quote link</h3>
+            <h3 className="text-base font-semibold text-emerald-950">Share quote link</h3>
             <p className="mt-1 text-sm text-slate-500">
               Sends people to your quote form — submissions land in your pipeline.
             </p>
@@ -87,7 +87,7 @@ export default function ShareLinkModal({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={handleCopy}
-            className="shrink-0 rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-gold-400"
+            className="shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
             {copied ? "Copied" : "Copy"}
           </button>
