@@ -2,7 +2,7 @@
 
 @theme {
   /* ── Palette v4 (2026-09-22, FINAL — see /home/team/shared/ethos-style-crm-spec.md) ──
-     Green + white + gold. The legacy navy-*/gold-* tokens are REDEFINED —
+     Green + white + gold. The legacy navy- and gold- tokens are REDEFINED —
      Tailwind v4 compiles utilities like bg-navy-800 to var(--color-navy-800),
      so existing class usage remaps to the new palette site-wide without
      touching every file:
