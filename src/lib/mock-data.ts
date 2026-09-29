@@ -15,6 +15,8 @@ export interface Lead {
   coverage_amount_requested: number;
   health_notes: Record<string, unknown>;
   created_at: string;
+  /** Where the lead came from (e.g. csv_import, request_access, consumer_inquiry). */
+  source?: string | null;
   /** Compliance surface (E1): true once a do-not-contact is recorded for this lead. */
   do_not_contact?: boolean;
   tcpa_consent?: boolean;

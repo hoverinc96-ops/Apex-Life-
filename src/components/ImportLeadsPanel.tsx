@@ -10,7 +10,14 @@ interface ImportResult {
   errors: { row: number; reason: string }[];
 }
 
-export default function ImportLeadsPanel({ onImported }: { onImported?: () => void }) {
+export default function ImportLeadsPanel({
+  onImported,
+  forceOpen = false,
+}: {
+  onImported?: () => void;
+  /** Lets a parent (e.g. the Overview quick action) open the panel too. */
+  forceOpen?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
@@ -74,7 +81,7 @@ export default function ImportLeadsPanel({ onImported }: { onImported?: () => vo
       </button>
 
       {open && (
-        <div className="space-y-4 px-6 pb-5 pt-1">
+        <div className="space-y-4 border-t border-slate-100 px-6 pb-5 pt-4">
           <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
             <div>
               <label htmlFor="leads-csv-file" className="mb-1.5 block text-xs font-medium text-slate-400">
@@ -94,7 +101,7 @@ export default function ImportLeadsPanel({ onImported }: { onImported?: () => vo
                 type="button"
                 onClick={handleImport}
                 disabled={importing}
-                className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {importing ? "Importing…" : "Import"}
               </button>

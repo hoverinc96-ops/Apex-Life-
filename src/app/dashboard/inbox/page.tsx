@@ -374,7 +374,7 @@ export default function InboxPage() {
               <button
                 disabled={busyId === h.id}
                 onClick={() => doAction("claim", h)}
-                className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
               >
                 {busyId === h.id ? "Claiming..." : "Claim"}
               </button>
@@ -465,7 +465,7 @@ export default function InboxPage() {
             onClick={() => setView("active")}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition ${
               view === "active"
-                ? "bg-gold-500 text-navy-900"
+                ? "bg-emerald-600 text-white"
                 : "text-slate-300 hover:text-slate-100"
             }`}
           >
@@ -475,7 +475,7 @@ export default function InboxPage() {
             onClick={() => setView("declined")}
             className={`rounded-md px-4 py-1.5 text-sm font-medium transition ${
               view === "declined"
-                ? "bg-gold-500 text-navy-900"
+                ? "bg-emerald-600 text-white"
                 : "text-slate-300 hover:text-slate-100"
             }`}
           >
@@ -492,7 +492,7 @@ export default function InboxPage() {
             <p className="text-sm text-red-400">{error}</p>
             <button
               onClick={fetchInbox}
-              className="mt-3 rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900"
+              className="mt-3 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
             >
               Try again
             </button>
@@ -562,7 +562,7 @@ export default function InboxPage() {
                         setRehandoffFor(h);
                         setRehandoffRepId("");
                       }}
-                      className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
                     >
                       Re-hand off
                     </button>
@@ -590,7 +590,7 @@ export default function InboxPage() {
                     <button
                       disabled={busyId === h.id}
                       onClick={() => doRehandoff(h)}
-                      className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
                     >
                       {busyId === h.id ? "Re-handing off..." : "Re-hand off"}
                     </button>
@@ -662,7 +662,7 @@ export default function InboxPage() {
                 <button
                   disabled={busyId === reassignFor.id}
                   onClick={() => doReassign(reassignFor)}
-                  className="rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
                 >
                   {busyId === reassignFor.id ? "Reassigning..." : "Reassign"}
                 </button>

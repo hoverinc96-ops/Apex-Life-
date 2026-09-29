@@ -194,7 +194,7 @@ export default function BookPage() {
                 checked={form.consent}
                 onChange={update("consent")}
                 required
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[#d4a843]"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-amber-500"
               />
               <span>
                 I agree to be contacted by Apex Life AI by email and/or phone
@@ -212,7 +212,7 @@ export default function BookPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-gold-500 px-6 py-4 font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+              className="w-full rounded-xl bg-emerald-600 px-6 py-4 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
             >
               {submitting ? "Submitting…" : "Request a call"}
             </button>

@@ -436,7 +436,7 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
                           <button
                             onClick={handleHandoff}
                             disabled={handoffBusy || !selectedRepId}
-                            className="flex-1 rounded-lg bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-900 transition hover:bg-gold-400 disabled:opacity-60"
+                            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
                           >
                             {handoffBusy ? "Handing off..." : "Confirm hand off"}
                           </button>

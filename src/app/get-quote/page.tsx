@@ -481,7 +481,7 @@ export default function GetQuotePage() {
                     type="button"
                     aria-label={`Go back to step ${s}: ${STEP_QUESTIONS[s - 1]}`}
                     onClick={() => selectStep(s)}
-                    className="block h-full w-full rounded-full bg-gold-500 transition hover:bg-gold-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+                    className="block h-full w-full rounded-full bg-gold-500 transition hover:bg-gold-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
                   />
                 ) : (
                   <span
@@ -512,7 +512,7 @@ export default function GetQuotePage() {
           type="button"
           onClick={() => goTo(step === 1 ? INTRO : step - 1)}
           aria-label="Back to previous question"
-          className="-ml-2 rounded-lg px-2 py-2 text-sm font-medium text-navy-700 transition hover:underline hover:underline-offset-4 hover:decoration-gold-500 hover:text-navy-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+          className="-ml-2 rounded-lg px-2 py-2 text-sm font-medium text-navy-700 transition hover:underline hover:underline-offset-4 hover:decoration-gold-500 hover:text-navy-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
         >
           ← Back
         </button>
@@ -527,7 +527,7 @@ export default function GetQuotePage() {
     big = false
   ) => (
     <label
-      className={`flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl bg-white px-5 text-left transition hover:bg-[#FAFAF7] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#d4a843] ${
+      className={`flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl bg-white px-5 text-left transition hover:bg-[#FAFAF7] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#f59e0b] ${
         checked
           ? "bg-[#FBF6EA] ring-2 ring-inset ring-gold-500"
           : "ring-1 ring-inset ring-[#E5E2DA]"
@@ -600,7 +600,7 @@ export default function GetQuotePage() {
       <button
         type="button"
         onClick={() => goTo(1)}
-        className="mt-8 w-full rounded-xl bg-gold-500 px-6 py-4 text-base font-semibold text-navy-900 transition hover:bg-gold-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+        className="mt-8 w-full rounded-xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
       >
         Get started →
       </button>
@@ -642,7 +642,7 @@ export default function GetQuotePage() {
                   autoComplete="name"
                   aria-invalid={errors.name ? true : undefined}
                   aria-describedby={errors.name ? "gq-name-error" : undefined}
-                  className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 placeholder-slate-400 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+                  className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 placeholder-slate-400 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
                 />
                 {renderFieldError(errors.name, "gq-name-error")}
               </div>
@@ -666,7 +666,7 @@ export default function GetQuotePage() {
                   autoComplete="email"
                   aria-invalid={errors.email ? true : undefined}
                   aria-describedby={errors.email ? "gq-email-error" : undefined}
-                  className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 placeholder-slate-400 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+                  className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 placeholder-slate-400 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
                 />
                 {renderFieldError(errors.email, "gq-email-error")}
               </div>
@@ -690,7 +690,7 @@ export default function GetQuotePage() {
                     autoComplete="tel"
                     aria-invalid={phoneWarn ? true : undefined}
                     aria-describedby={phoneWarn ? "gq-phone-warn" : undefined}
-                    className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 placeholder-slate-400 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+                    className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 placeholder-slate-400 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
                   />
                   {phoneWarn && (
                     <p id="gq-phone-warn" role="status" className="mt-2 flex items-start gap-1.5 text-sm text-amber-700">
@@ -711,7 +711,7 @@ export default function GetQuotePage() {
                       set("state", v === "" || v === "__prefer_not" ? null : v);
                     }}
                     autoComplete="address-level1"
-                    className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+                    className="w-full rounded-xl border border-[#E5E2DA] bg-white px-4 py-3.5 text-base text-navy-900 outline-none transition focus:border-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
                   >
                     <option value="">Select a state</option>
                     {LICENSED_STATES.map((st) => (
@@ -735,7 +735,7 @@ export default function GetQuotePage() {
           </div>
           <button
             type="submit"
-            className="mt-8 w-full rounded-xl bg-gold-500 px-6 py-4 text-base font-semibold text-navy-900 transition hover:bg-gold-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+            className="mt-8 w-full rounded-xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
           >
             Continue →
           </button>
@@ -882,7 +882,7 @@ export default function GetQuotePage() {
         <button
           type="submit"
           disabled={!selectionMade}
-          className="mt-8 w-full rounded-xl bg-gold-500 px-6 py-4 text-base font-semibold text-navy-900 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+          className="mt-8 w-full rounded-xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
         >
           Continue →
         </button>
@@ -931,7 +931,7 @@ export default function GetQuotePage() {
                 type="button"
                 onClick={() => selectStep(row.target)}
                 aria-label={`Change ${row.label.toLowerCase()}`}
-                className="shrink-0 rounded-lg px-2 py-1.5 text-[13px] font-medium text-navy-700 underline-offset-4 transition hover:text-navy-900 hover:underline hover:decoration-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+                className="shrink-0 rounded-lg px-2 py-1.5 text-[13px] font-medium text-navy-700 underline-offset-4 transition hover:text-navy-900 hover:underline hover:decoration-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
               >
                 Change
               </button>
@@ -939,7 +939,7 @@ export default function GetQuotePage() {
           ))}
         </dl>
 
-        <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-[#E5E2DA] bg-white px-4 py-4 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#d4a843]">
+        <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-[#E5E2DA] bg-white px-4 py-4 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#f59e0b]">
           <input
             ref={consentRef}
             type="checkbox"
@@ -951,7 +951,7 @@ export default function GetQuotePage() {
             }}
             aria-invalid={errors.consent ? true : undefined}
             aria-describedby={errors.consent ? "gq-consent-error" : undefined}
-            className="mt-0.5 h-5 w-5 shrink-0 accent-[#d4a843]"
+            className="mt-0.5 h-5 w-5 shrink-0 accent-[#f59e0b]"
           />
           <span className="text-[13px] leading-relaxed text-slate-700">{CONSENT_TEXT}</span>
         </label>
@@ -985,7 +985,7 @@ export default function GetQuotePage() {
         <button
           type="submit"
           disabled={!consent || submitting}
-          className="mt-6 w-full rounded-xl bg-gold-500 px-6 py-4 text-base font-semibold text-navy-900 transition hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+          className="mt-6 w-full rounded-xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
         >
           {submitting ? "Sending…" : "Send me my options"}
         </button>
@@ -1040,7 +1040,7 @@ export default function GetQuotePage() {
         </p>
         <a
           href="/"
-          className="mt-8 block w-full rounded-xl bg-gold-500 px-6 py-4 text-center text-base font-semibold text-navy-900 transition hover:bg-gold-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d4a843]"
+          className="mt-8 block w-full rounded-xl bg-emerald-600 px-6 py-4 text-center text-base font-semibold text-white transition hover:bg-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
         >
           Back to homepage
         </a>
