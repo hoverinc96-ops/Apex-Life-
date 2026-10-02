@@ -1,6 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ATTRIBUTION_STORAGE_KEY,
+  EMPTY_ATTRIBUTION,
+  hasAttribution,
+  readAttributionFromSearch,
+  type Attribution,
+} from "@/lib/attribution";
 
 /**
  * Consumer inquiry wizard — "/get-quote".
@@ -206,6 +213,9 @@ export default function GetQuotePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  // E4 — attribution captured on entry, persisted in sessionStorage so it
+  // survives client-side navigation and reloads. All-null = direct.
+  const [attribution, setAttribution] = useState<Attribution>(EMPTY_ATTRIBUTION);
 
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
@@ -214,6 +224,30 @@ export default function GetQuotePage() {
 
   // ── sessionStorage persistence (refresh resilience) ──
   useEffect(() => {
+    // ── Attribution (E4): restore, or capture once on first entry ──
+    // Stored values win over the URL (first-touch); a fresh entry with no
+    // stored attribution captures whatever the URL carries — possibly
+    // nothing, which stays nothing (no invented defaults).
+    try {
+      const rawAttr = window.sessionStorage.getItem(ATTRIBUTION_STORAGE_KEY);
+      if (rawAttr) {
+        const saved = JSON.parse(rawAttr) as Partial<Attribution>;
+        setAttribution({ ...EMPTY_ATTRIBUTION, ...saved });
+      } else {
+        const fromUrl = readAttributionFromSearch(window.location.search);
+        if (hasAttribution(fromUrl)) {
+          setAttribution({ ...EMPTY_ATTRIBUTION, ...fromUrl });
+          window.sessionStorage.setItem(
+            ATTRIBUTION_STORAGE_KEY,
+            JSON.stringify(fromUrl)
+          );
+        }
+      }
+    } catch {
+      // Storage unavailable (private mode etc.) — flow still works; the
+      // submission simply carries no attribution rather than a wrong one.
+    }
+
     try {
       const raw = window.sessionStorage.getItem(STORAGE_KEY);
       if (!raw) return;
@@ -253,6 +287,9 @@ export default function GetQuotePage() {
   const clearStored = useCallback(() => {
     try {
       window.sessionStorage.removeItem(STORAGE_KEY);
+      // Attribution too: the next visitor in this tab starts clean. A same-tab
+      // re-land with params recaptures from the URL.
+      window.sessionStorage.removeItem(ATTRIBUTION_STORAGE_KEY);
     } catch {
       /* noop */
     }
@@ -389,6 +426,16 @@ export default function GetQuotePage() {
             tobacco_use: answers.tobacco_use,
             health_status: answers.health_status,
             monthly_budget: answers.monthly_budget,
+            // E4 — attribution, verbatim from the entry URL. Absent params are
+            // sent as null; the server never invents a source.
+            utm_source: attribution.utm_source,
+            utm_medium: attribution.utm_medium,
+            utm_campaign: attribution.utm_campaign,
+            utm_content: attribution.utm_content,
+            utm_term: attribution.utm_term,
+            fbclid: attribution.fbclid,
+            gclid: attribution.gclid,
+            msclkid: attribution.msclkid,
             consent_contact: true,
           }),
         });

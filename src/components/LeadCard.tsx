@@ -1,6 +1,7 @@
 "use client";
 
 import { Lead, formatCurrency, getDaysSince, getScoreColor } from "@/lib/mock-data";
+import { attributionChipLabel } from "@/lib/attribution";
 
 interface LeadCardProps {
   lead: Lead;
@@ -10,6 +11,7 @@ interface LeadCardProps {
 export default function LeadCard({ lead, onClick }: LeadCardProps) {
   const days = getDaysSince(lead.created_at);
   const scoreColor = getScoreColor(lead.qualification_score);
+  const attr = attributionChipLabel(lead);
 
   return (
     <button
@@ -31,10 +33,19 @@ export default function LeadCard({ lead, onClick }: LeadCardProps) {
         </span>
       </div>
 
-      {/* State + Days row */}
+      {/* State + attribution + Days row */}
       <div className="flex items-center gap-2 text-xs text-slate-500">
         <span className="rounded border border-navy-600 px-1.5 py-0.5 text-[10px] uppercase tracking-wider">
           {lead.state}
+        </span>
+        <span
+          className={`rounded border px-1.5 py-0.5 text-[10px] font-medium ${
+            attr
+              ? "border-amber-200 bg-amber-50 text-amber-800"
+              : "border-slate-200 bg-slate-50 text-slate-500"
+          }`}
+        >
+          {attr ?? "Direct"}
         </span>
         <span>
           {days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`}

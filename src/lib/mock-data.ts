@@ -17,6 +17,15 @@ export interface Lead {
   created_at: string;
   /** Where the lead came from (e.g. csv_import, request_access, consumer_inquiry). */
   source?: string | null;
+  /** E4 attribution — captured on /get-quote entry; null/absent = direct. */
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_content?: string | null;
+  utm_term?: string | null;
+  fbclid?: string | null;
+  gclid?: string | null;
+  msclkid?: string | null;
   /** Compliance surface (E1): true once a do-not-contact is recorded for this lead. */
   do_not_contact?: boolean;
   tcpa_consent?: boolean;
