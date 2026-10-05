@@ -7,6 +7,7 @@ import {
   type ComplianceChannel,
 } from "@/lib/compliance";
 import { attributionValueOrNull } from "@/lib/attribution";
+import { sendAckEmail } from "@/lib/email-ack";
 
 /** Extract a client IP from common proxy headers; falls back to null. */
 function clientIp(request: NextRequest): string | null {
@@ -76,6 +77,9 @@ function optionalPositiveInt(v: unknown): number | null {
  *   5. form_submitted audit event carries consent:true, the versioned text,
  *      and dnc_matched (fresh inbound consent overrides DNC, but the audit
  *      never stays silent about a match).
+ *   8. Acknowledgment email (E2, best-effort — src/lib/email-ack.ts): one
+ *      outcome row per lead in email_ack_log, surfaced on the lead timeline.
+ *      Never blocks or fails the submission.
  *
  * All qualifier fields (age_range, term_years, tobacco_use,
  * coverage_amount_requested, health_status, monthly_budget,
@@ -308,6 +312,23 @@ export async function POST(request: NextRequest) {
       });
     } catch (auditErr) {
       console.error("POST /api/consumer-inquiry audit write error:", auditErr);
+    }
+
+    // 8. Acknowledgment email (E2) — best-effort and bounded: the outcome
+    // (sent / failed / suppressed / skipped) is recorded on the lead's timeline
+    // by sendAckEmail itself. It never throws and never fails the lead: a
+    // missing API key, missing approved copy, suppression, provider rejection,
+    // or a 5s timeout all degrade to a recorded timeline event.
+    try {
+      await sendAckEmail({
+        leadId,
+        email: email.trim(),
+        firstName: first_name,
+      });
+    } catch (ackErr) {
+      // Belt-and-braces: the lib never throws upward, but the lead must not
+      // be lost to an unexpected failure in this path either.
+      console.error("POST /api/consumer-inquiry ack email error (lead unaffected):", ackErr);
     }
 
     return NextResponse.json(result.rows[0], { status: 201 });

@@ -15,6 +15,7 @@
     "db:migrate-bookings": "bun run db/migrate-bookings.ts",
     "db:migrate-consumer-inquiry": "bun run db/migrate-consumer-inquiry.ts",
     "db:migrate-utm-attribution": "bun run db/migrate-utm-attribution.ts",
+    "db:migrate-email-ack": "bun run db/migrate-email-ack.ts",
     "db:migrate-calendar": "bun run db/migrate-google-calendar-sync.ts",
     "db:migrate-timeline": "bun run db/migrate-timeline.ts",
     "db:seed": "bun run db/seed.ts",

@@ -70,7 +70,7 @@ export interface Conversation {
 
 export interface TimelineEvent {
   id: string;
-  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote" | "dnc";
+  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote" | "dnc" | "email_ack";
   title: string;
   description?: string;
   timestamp: string;

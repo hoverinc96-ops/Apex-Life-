@@ -30,7 +30,7 @@ function cap(s: string): string {
 
 interface TimelineEvent {
   id: string;
-  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote" | "dnc";
+  type: "lead_created" | "status_changed" | "conversation" | "message" | "quote" | "dnc" | "email_ack";
   title: string;
   description?: string;
   timestamp: string;
@@ -153,6 +153,36 @@ async function buildTimeline(
       description: bits.join(" — ") || `Suppression scope: ${String(d.dnc_type)}`,
       timestamp: d.added_at as string,
       meta: { channel: d.channel, source: d.source, dnc_type: d.dnc_type },
+    });
+  }
+
+  // E2 — acknowledgment-email outcome (email_ack_log): exactly one row per
+  // submission, so the timeline shows whether the consumer's acknowledgment
+  // email was sent, failed, suppressed (DNC/withdrawn consent), or skipped
+  // (e.g. no compliance-approved copy configured yet). Best-effort: if the
+  // table is missing (migration not run yet) the timeline simply omits the
+  // event instead of breaking the lead panel.
+  let ackRows: Record<string, unknown>[] = [];
+  try {
+    const ackResult = await pool.query(
+      `SELECT id, status, from_address, provider_id, reason, detail, created_at
+         FROM email_ack_log WHERE lead_id = $1
+        ORDER BY created_at ASC`,
+      [leadId]
+    );
+    ackRows = ackResult.rows;
+  } catch (ackErr) {
+    console.error("buildTimeline email_ack_log query error (timeline omits ack events):", ackErr);
+  }
+  for (const a of ackRows) {
+    const statusTitle = `Acknowledgment email ${String(a.status)}`;
+    events.push({
+      id: `evt-email-ack-${a.id}`,
+      type: "email_ack",
+      title: statusTitle,
+      description: (a.detail as string)?.slice(0, 200) || undefined,
+      timestamp: a.created_at as string,
+      meta: { status: a.status, reason: a.reason, from_address: a.from_address },
     });
   }
 

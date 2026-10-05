@@ -26,6 +26,7 @@ const TIMELINE_ICONS: Record<TimelineEvent["type"], string> = {
   message: "📨",
   quote: "📄",
   dnc: "🚫",
+  email_ack: "✉️",
 };
 
 const fmtTimestamp = (iso: string): string =>
