@@ -185,6 +185,37 @@ async function recordAckOutcome(
 }
 
 /**
+ * Placeholder substitution for the acknowledgment body (compliance spec §3.1,
+ * /home/team/shared/ack-email-template.md). Only two placeholders exist and
+ * only these two are touched — the copy itself is frozen and lives in the
+ * template config (env/code), never here:
+ *   {{first_name}} -> the submitter's first name, trimmed; fallback "there"
+ *                     when absent/empty.
+ *   {{state}}      -> the state exactly as selected (e.g. "NJ"); fallback
+ *                     "wherever you are" when empty/NULL or the literal
+ *                     "Prefer not to say" (never shown to the consumer).
+ * Single pass over the ORIGINAL string: replacement values are never
+ * re-scanned, so a name containing "{{...}}" cannot be substituted, and a
+ * body that was already substituted once is unchanged by a second pass. Any
+ * other {{token}} passes through untouched.
+ */
+export function renderAckBody(
+  body: string,
+  personalization: { firstName?: string | null; state?: string | null }
+): string {
+  const firstName = (personalization.firstName ?? "").trim();
+  const state = (personalization.state ?? "").trim();
+  const name = firstName || "there";
+  const where =
+    state && state.toLowerCase() !== "prefer not to say"
+      ? state
+      : "wherever you are";
+  return body.replace(/\{\{(first_name|state)\}\}/g, (_match, token: string) =>
+    token === "first_name" ? name : where
+  );
+}
+
+/**
  * Attempt the acknowledgment email for a consumer-inquiry lead and record the
  * outcome on the lead's timeline. NEVER throws; NEVER fails the lead.
  * Bounded by ACK_TIMEOUT_MS on the provider call.
@@ -193,8 +224,9 @@ export async function sendAckEmail(input: {
   leadId: string;
   email: string;
   firstName?: string | null;
+  state?: string | null;
 }): Promise<AckResult> {
-  const { leadId, email } = input;
+  const { leadId, email, firstName, state } = input;
 
   // Guard 1 — API key present? (task: only attempt sending when it is)
   const apiKey = (process.env.RESEND_API_KEY ?? "").trim();
@@ -249,7 +281,8 @@ export async function sendAckEmail(input: {
       from,
       to: [email],
       subject: template.subject,
-      text: template.body,
+      // §3.1 substitution — placeholders are resolved at send time only.
+      text: renderAckBody(template.body, { firstName, state }),
     });
 
     const timeout = new Promise<{ timedOut: true }>((resolve) =>
