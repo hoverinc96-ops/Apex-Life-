@@ -324,6 +324,7 @@ export async function POST(request: NextRequest) {
         leadId,
         email: email.trim(),
         firstName: first_name,
+        state: stateValue, // §3.1: state feeds the {{state}} placeholder
       });
     } catch (ackErr) {
       // Belt-and-braces: the lib never throws upward, but the lead must not
