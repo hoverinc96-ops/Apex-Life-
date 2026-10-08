@@ -88,3 +88,103 @@ h3:not(.text-white) {
 .hover\:text-slate-100:hover {
   color: #0f172a;
 }
+
+/* ── Pop pass: gradience system (design spec 2026-09-29; CSS-only, palette v4) ── */
+
+/* 1a. Hero wash — layered radial glows over a base sheen. One element, no filter:blur
+      (each background layer paints in one pass — cheaper than blurred divs). */
+.wash-hero {
+  background:
+    /* emerald glow, top-left (replaces gold orb's job, on-palette) */
+    radial-gradient(52rem 36rem at 15% -8%, rgba(5, 150, 105, 0.12), transparent 62%),
+    /* amber halo behind the centered badge + h1 area — whisper only */
+    radial-gradient(30rem 20rem at 50% 20%, rgba(245, 158, 11, 0.06), transparent 70%),
+    /* emerald whisper, bottom-right (replaces the off-palette blue-500 orb) */
+    radial-gradient(46rem 30rem at 88% 80%, rgba(5, 150, 105, 0.07), transparent 65%),
+    /* base: white → slate-50 → emerald-50 diagonal sheen */
+    linear-gradient(160deg, #ffffff 0%, #f8fafc 46%, #ecfdf5 100%);
+}
+
+/* 1b. Dot texture — masked so it dissolves before mid-page; never behind text-dense
+      areas below the hero. Optional (step 3 of implementation order). */
+.dots-fade {
+  background-image: radial-gradient(rgba(5, 150, 105, 0.12) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(62rem 42rem at 50% 0%, #000 26%, transparent 74%);
+  mask-image: radial-gradient(62rem 42rem at 50% 0%, #000 26%, transparent 74%);
+  opacity: 0.55;
+}
+
+/* 1c. Section tint with soft vertical fade (white ↔ emerald-50, no hard edges). */
+.section-tint-fade {
+  background: linear-gradient(
+    180deg,
+    rgba(236, 253, 245, 0) 0%,
+    #ecfdf5 14%,
+    #ecfdf5 86%,
+    rgba(236, 253, 245, 0) 100%
+  );
+}
+
+/* 1d. Feature-card gradient hairline border (1px, emerald→slate→amber). */
+.card-ring {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(135deg, rgba(5, 150, 105, 0.32), rgba(203, 213, 225, 0.55) 42%, rgba(245, 158, 11, 0.26)) border-box;
+  box-shadow: 0 1px 2px rgba(2, 44, 34, 0.04);
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.card-ring:hover,
+.card-ring:focus-visible {
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(135deg, rgba(5, 150, 105, 0.55), rgba(203, 213, 225, 0.4) 42%, rgba(245, 158, 11, 0.45)) border-box;
+  box-shadow: 0 14px 32px -14px rgba(5, 150, 105, 0.22), 0 1px 2px rgba(2, 44, 34, 0.05);
+  transform: translateY(-2px);
+}
+
+/* 1e. Soft inner wash for panels (Pilot panel, /book panel, get-quote intro card). */
+.wash-panel {
+  background-image: radial-gradient(38rem 16rem at 50% 0%, rgba(5, 150, 105, 0.06), transparent 70%);
+}
+
+/* 1f. Amber glow ring for ◆ marks, progress "current" segment, trust badges. */
+.glow-amber { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.14); }
+.glow-emerald { box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.14); }
+
+/* 1g. ◆ sheen — opt-in via .mark-sheen; never applied anywhere by default. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes mark-breathe {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0)); }
+    50% { filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.45)); }
+  }
+  .mark-sheen { animation: mark-breathe 3.2s ease-in-out infinite; }
+  /* gentle float for the optional hero blob */
+  @keyframes blob-drift {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(0, -14px, 0) scale(1.03); }
+  }
+  .blob-drift { animation: blob-drift 11s ease-in-out infinite; }
+}
+
+/* 1h. Mobile fallback — kill texture + third glow, shrink the wash. */
+@media (max-width: 640px) {
+  .wash-hero {
+    background:
+      radial-gradient(34rem 26rem at 20% -6%, rgba(5, 150, 105, 0.10), transparent 62%),
+      radial-gradient(24rem 16rem at 50% 16%, rgba(245, 158, 11, 0.05), transparent 70%),
+      linear-gradient(170deg, #ffffff 0%, #f8fafc 55%, #ecfdf5 100%);
+  }
+  .dots-fade { display: none; }
+  .card-ring:hover { transform: none; } /* no hover-lift on touch */
+}
+
+/* 2d/2e. Funnel shell + gold-note halos (utilities for the get-quote main and
+   booking gold note panel — spec allows a small utility instead of inline soup). */
+.wash-quote-shell {
+  background-image: radial-gradient(46rem 22rem at 50% -6%, rgba(5, 150, 105, 0.05), transparent 62%);
+}
+.glow-amber-wash {
+  background-image: radial-gradient(24rem 10rem at 50% 0%, rgba(245, 158, 11, 0.07), transparent 70%);
+}

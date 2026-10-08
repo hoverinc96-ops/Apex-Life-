@@ -536,7 +536,7 @@ export default function GetQuotePage() {
                     aria-disabled={!isPast && !isCurrent ? true : undefined}
                     className={`block h-full w-full rounded-full ${
                       isCurrent
-                        ? "bg-gold-500 ring-2 ring-inset ring-navy-900/70"
+                        ? "glow-emerald bg-gold-500 ring-2 ring-inset ring-navy-900/70"
                         : isPast
                           ? "bg-gold-500"
                           : "bg-[#E4E2DB]"
@@ -632,15 +632,15 @@ export default function GetQuotePage() {
       </p>
       <ul className="mx-auto mt-6 max-w-sm space-y-2 text-left text-[15px] text-slate-700">
         <li className="flex items-start gap-2">
-          <span aria-hidden="true" className="mt-0.5 text-gold-500">◆</span>
+          <span aria-hidden="true" className="glow-amber mt-0.5 text-gold-500">◆</span>
           No obligation. This is just an inquiry.
         </li>
         <li className="flex items-start gap-2">
-          <span aria-hidden="true" className="mt-0.5 text-gold-500">◆</span>
+          <span aria-hidden="true" className="glow-amber mt-0.5 text-gold-500">◆</span>
           No spam. We only write about your options.
         </li>
         <li className="flex items-start gap-2">
-          <span aria-hidden="true" className="mt-0.5 text-gold-500">◆</span>
+          <span aria-hidden="true" className="glow-amber mt-0.5 text-gold-500">◆</span>
           Opt out anytime — just say the word.
         </li>
       </ul>
@@ -1096,7 +1096,7 @@ export default function GetQuotePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F7F6F2] text-navy-900">
+    <main className="wash-quote-shell min-h-screen bg-[#F7F6F2] text-navy-900">
       <a
         href="#questions"
         onClick={skipToQuestions}
