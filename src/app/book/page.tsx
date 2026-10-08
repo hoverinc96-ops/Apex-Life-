@@ -105,7 +105,7 @@ export default function BookPage() {
         {!submitted ? (
           <form
             onSubmit={handleSubmit}
-            className="mt-8 flex flex-col gap-4 rounded-2xl border border-navy-700/50 bg-navy-800/40 p-6"
+            className="wash-panel mt-8 flex flex-col gap-4 rounded-2xl border border-navy-700/50 bg-navy-800/40 p-6"
           >
             <div className="flex flex-col gap-1.5">
               <label htmlFor="name" className="text-xs font-medium uppercase tracking-wide text-slate-500">
@@ -118,7 +118,7 @@ export default function BookPage() {
                 onChange={update("name")}
                 placeholder="Jane Smith"
                 required
-                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
               />
             </div>
 
@@ -133,7 +133,7 @@ export default function BookPage() {
                 onChange={update("email")}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
               />
             </div>
 
@@ -147,7 +147,7 @@ export default function BookPage() {
                 value={form.phone}
                 onChange={update("phone")}
                 placeholder="(555) 123-4567"
-                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
               />
             </div>
 
@@ -159,7 +159,7 @@ export default function BookPage() {
                 id="topic"
                 value={form.topic}
                 onChange={update("topic")}
-                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white outline-none transition focus:border-gold-500"
+                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white outline-none transition focus:border-emerald-600"
               >
                 {TOPICS.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -177,7 +177,7 @@ export default function BookPage() {
                 id="requested_time"
                 value={form.requested_time}
                 onChange={update("requested_time")}
-                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white outline-none transition focus:border-gold-500"
+                className="w-full rounded-xl border border-navy-600 bg-navy-900 px-4 py-3 text-white outline-none transition focus:border-emerald-600"
               >
                 <option value="">Any time — you pick</option>
                 {TIME_SLOTS.map((s) => (
@@ -212,7 +212,7 @@ export default function BookPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-emerald-600 px-6 py-4 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
+              className="w-full rounded-xl bg-emerald-600 px-6 py-4 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 hover:shadow-lg hover:shadow-emerald-600/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
             >
               {submitting ? "Submitting…" : "Request a call"}
             </button>
@@ -224,7 +224,7 @@ export default function BookPage() {
             </p>
           </form>
         ) : (
-          <div className="mt-8 rounded-2xl border border-gold-500/30 bg-gold-500/5 px-8 py-6">
+          <div className="glow-amber-wash mt-8 rounded-2xl border border-gold-500/30 bg-gold-500/5 px-8 py-6">
             <p className="text-lg font-semibold text-gold-400">
               🎉 Thanks, {form.name.split(" ")[0] || "there"} — request received.
             </p>

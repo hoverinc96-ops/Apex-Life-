@@ -40,7 +40,7 @@ function Navbar() {
           </a>
           <a
             href="#cta"
-            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
           >
             Start a Free 60-Day Pilot
           </a>
@@ -101,11 +101,13 @@ function Navbar() {
 function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-20">
-      {/* Background gradient orbs */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-gold-500/5 blur-[120px]" />
-        <div className="absolute -bottom-20 right-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/5 blur-[100px]" />
-      </div>
+      {/* Background wash + texture */}
+      <div className="wash-hero pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="dots-fade pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div
+        className="blob-drift pointer-events-none absolute right-[8%] top-[22%] hidden h-40 w-40 rounded-full border border-emerald-600/10 bg-emerald-50/40 lg:block"
+        aria-hidden="true"
+      />
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/5 px-4 py-1.5">
@@ -132,13 +134,13 @@ function Hero() {
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
             href="#cta"
-            className="rounded-xl bg-emerald-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700"
+            className="rounded-xl bg-emerald-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
           >
             Start a Free 60-Day Pilot →
           </a>
           <a
             href="#how-it-works"
-            className="rounded-xl border border-slate-600 px-8 py-4 text-base font-medium text-slate-200 transition hover:border-slate-400 hover:text-white"
+            className="rounded-xl border border-slate-600 px-8 py-4 text-base font-medium text-slate-200 transition hover:border-emerald-600/40 hover:text-white"
           >
             See How It Works
           </a>
@@ -203,7 +205,7 @@ const features = [
 
 function Features() {
   return (
-    <section id="features" className="py-24">
+    <section id="features" className="section-tint-fade py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-gold-500">
@@ -220,7 +222,7 @@ function Features() {
           {features.map((f) => (
             <div
               key={f.title}
-              className="group rounded-2xl border border-navy-700/50 bg-navy-800/50 p-8 transition hover:border-gold-500/30 hover:bg-navy-800"
+              className="card-ring group rounded-2xl p-8"
             >
               <div className="mb-4 text-3xl">{f.emoji}</div>
               <h3 className="mb-3 text-lg font-semibold">{f.title}</h3>
@@ -279,12 +281,12 @@ function HowItWorks() {
           {steps.map((s, i) => (
             <div key={s.step} className="relative">
               <div className="mb-4 flex items-center gap-4">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-500 text-sm font-bold text-navy-900">
+                <span className="flex h-10 w-10 items-center justify-center glow-amber rounded-full bg-gold-500 text-sm font-bold text-navy-900">
                   {s.step}
                 </span>
                 {/* Connector line (hidden on last item) */}
                 {i < steps.length - 1 && (
-                  <div className="hidden h-px flex-1 bg-navy-700 lg:block" />
+                  <div className="hidden h-px flex-1 bg-gradient-to-r from-emerald-600/25 to-emerald-600/5 lg:block" />
                 )}
               </div>
               <h3 className="mb-2 text-lg font-semibold">{s.title}</h3>
@@ -323,7 +325,7 @@ function Pilot() {
   return (
     <section className="py-24">
       <div className="mx-auto max-w-5xl px-6">
-        <div className="rounded-3xl border border-navy-700/50 bg-navy-800/50 px-8 py-16">
+        <div className="wash-panel rounded-3xl border border-navy-700/50 bg-navy-800/50 px-8 py-16">
           <div className="mb-12 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-gold-500">
               Pilot
@@ -390,7 +392,7 @@ function CTA() {
   };
 
   return (
-    <section id="cta" className="py-24">
+    <section id="cta" className="section-tint-fade py-24">
       <div className="mx-auto max-w-3xl px-6 text-center">
         <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
           Ready to run your lead stream through it?
@@ -412,7 +414,7 @@ function CTA() {
               onChange={update("name")}
               placeholder="Full name"
               required
-              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
             />
             <input
               type="email"
@@ -420,14 +422,14 @@ function CTA() {
               onChange={update("email")}
               placeholder="you@agency.com"
               required
-              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
             />
             <input
               type="tel"
               value={form.phone}
               onChange={update("phone")}
               placeholder="Phone (optional)"
-              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
             />
             <input
               type="text"
@@ -436,7 +438,7 @@ function CTA() {
               placeholder="State (e.g. TX)"
               maxLength={2}
               required
-              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-gold-500"
+              className="w-full rounded-xl border border-navy-600 bg-navy-900 px-5 py-3.5 text-white placeholder-slate-500 outline-none transition focus:border-emerald-600"
             />
             {error && (
               <p className="rounded-lg bg-red-500/10 px-4 py-2 text-left text-sm text-red-400">
@@ -446,7 +448,7 @@ function CTA() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-emerald-600 px-6 py-4 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
+              className="w-full rounded-xl bg-emerald-600 px-6 py-4 font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60 hover:shadow-lg hover:shadow-emerald-600/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
             >
               {submitting ? "Submitting…" : "Start My Free Pilot"}
             </button>
@@ -471,7 +473,8 @@ function CTA() {
 // ── Footer ──────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer className="border-t border-navy-700/50 py-12">
+    <footer className="py-12">
+      <div className="h-px bg-gradient-to-r from-transparent via-emerald-600/25 to-transparent" />
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex items-center gap-2 text-lg font-bold">
