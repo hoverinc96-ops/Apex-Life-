@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { Mail, MessageSquare, Monitor, Phone } from "lucide-react";
+import type { ReactNode } from "react";
+
 import { useEffect, useState } from "react";
 
 interface ConversationMessage {
@@ -26,11 +29,11 @@ interface ConversationFeedItem {
   messages: ConversationMessage[];
 }
 
-const CHANNEL_ICONS: Record<string, string> = {
-  voice: "📞",
-  sms: "💬",
-  email: "✉️",
-  web_chat: "💻",
+const CHANNEL_ICONS: Record<string, ReactNode> = {
+  voice: <Phone className="h-5 w-5" aria-hidden="true" />,
+  sms: <MessageSquare className="h-5 w-5" aria-hidden="true" />,
+  email: <Mail className="h-5 w-5" aria-hidden="true" />,
+  web_chat: <Monitor className="h-5 w-5" aria-hidden="true" />,
 };
 
 const fmtDate = (iso: string): string =>
@@ -95,8 +98,8 @@ export default function ConversationsPage() {
 
       {!loading && !error && conversations.length === 0 && (
         <div className="mt-16 flex flex-col items-center justify-center text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-navy-800 text-2xl">
-            💬
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-navy-800">
+            <MessageSquare className="h-7 w-7" aria-hidden="true" />
           </div>
           <h3 className="text-base font-semibold text-slate-300">No conversations yet</h3>
           <p className="mt-1 max-w-sm text-sm text-slate-500">

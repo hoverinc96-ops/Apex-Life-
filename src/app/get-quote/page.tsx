@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Check, TriangleAlert } from "lucide-react";
+
 import {
   ATTRIBUTION_STORAGE_KEY,
   EMPTY_ATTRIBUTION,
