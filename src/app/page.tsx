@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BarChart3, Eye, FileText, Handshake, Mic, Search, Shield } from "lucide-react";
 
 import CarrierStrip from "@/components/CarrierStrip";
 import WelcomeGate from "@/components/WelcomeGate";
@@ -172,31 +173,31 @@ function Hero() {
 // ── Features ────────────────────────────────────────────────────────────────
 const features = [
   {
-    emoji: "🔍",
+    icon: Search,
     title: "Lead Capture",
     description:
       "Leads come from consented, self-identified sources — people who actively request a quote or agree to be contacted. We capture and record consent for every channel we reach them on, before any outreach.",
   },
   {
-    emoji: "🎙️",
+    icon: Mic,
     title: "AI Voice Negotiation",
     description:
       "Our voice agents conduct natural discovery conversations, present policies, handle objections, and negotiate terms — with full disclosure that they're AI.",
   },
   {
-    emoji: "📊",
+    icon: BarChart3,
     title: "Real-Time CRM Dashboard",
     description:
       "Monitor every lead across a Kanban pipeline. Watch live transcripts, review qualification scores, and take over any conversation with one click.",
   },
   {
-    emoji: "📄",
+    icon: FileText,
     title: "Proposals at your fingertips",
     description:
       "Carrier quotes and premiums surface on each lead so your team sees the exact offer and status — no digging through spreadsheets.",
   },
   {
-    emoji: "🤝",
+    icon: Handshake,
     title: "Warm Handoff to Humans",
     description:
       "When a lead needs a human touch, agents deliver a 30-second briefing summary and warm-transfer the call — your team picks up already informed.",
@@ -224,7 +225,7 @@ function Features() {
               key={f.title}
               className="card-ring group rounded-2xl p-8"
             >
-              <div className="mb-4 text-3xl">{f.emoji}</div>
+              <div className="mb-4 text-emerald-600"><f.icon className="h-8 w-8" aria-hidden="true" /></div>
               <h3 className="mb-3 text-lg font-semibold">{f.title}</h3>
               <p className="text-sm leading-relaxed text-slate-400">{f.description}</p>
             </div>
@@ -302,19 +303,19 @@ function HowItWorks() {
 // ── Pilot band ──────────────────────────────────────────────────────────────
 const pilotPoints = [
   {
-    emoji: "👁️",
+    icon: Eye,
     title: "Watch every conversation live.",
     description:
       "Your dashboard, your real leads, in a real database. Transcript, sentiment, and flagged objections in real time — and you can take over any call with one click.",
   },
   {
-    emoji: "🤝",
+    icon: Handshake,
     title: "Warm human handoff.",
     description:
       "When a lead wants a person, your licensed agent picks up already informed — briefing summary in hand. The AI steps out; you step in.",
   },
   {
-    emoji: "🛡️",
+    icon: Shield,
     title: "Compliance first.",
     description:
       "Consent and opt-out (Do-Not-Call) events are logged, PII is scrubbed from transcripts, and opted-out contacts are suppressed across channels. Request-access and opt-out paths are live and logged today.",
@@ -339,7 +340,7 @@ function Pilot() {
           <div className="grid gap-8 sm:grid-cols-3">
             {pilotPoints.map((p) => (
               <div key={p.title} className="text-left">
-                <div className="mb-3 text-3xl">{p.emoji}</div>
+                <div className="mb-3 text-emerald-600"><p.icon className="h-8 w-8" aria-hidden="true" /></div>
                 <h3 className="mb-2 text-lg font-semibold">{p.title}</h3>
                 <p className="text-sm leading-relaxed text-slate-400">{p.description}</p>
               </div>

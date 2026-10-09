@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FileText, Mail, MailCheck, MessageSquare, RefreshCw, ShieldOff, Sparkles } from "lucide-react";
+import type { ReactNode } from "react";
+
 import {
   Lead,
   LeadStatus,
@@ -19,14 +22,14 @@ type DetailedLead = Lead & {
   timeline: TimelineEvent[];
 };
 
-const TIMELINE_ICONS: Record<TimelineEvent["type"], string> = {
-  lead_created: "✨",
-  status_changed: "🔁",
-  conversation: "💬",
-  message: "📨",
-  quote: "📄",
-  dnc: "🚫",
-  email_ack: "✉️",
+const TIMELINE_ICONS: Record<TimelineEvent["type"], ReactNode> = {
+  lead_created: <Sparkles className="h-3 w-3" aria-hidden="true" />,
+  status_changed: <RefreshCw className="h-3 w-3" aria-hidden="true" />,
+  conversation: <MessageSquare className="h-3 w-3" aria-hidden="true" />,
+  message: <Mail className="h-3 w-3" aria-hidden="true" />,
+  quote: <FileText className="h-3 w-3" aria-hidden="true" />,
+  dnc: <ShieldOff className="h-3 w-3" aria-hidden="true" />,
+  email_ack: <MailCheck className="h-3 w-3" aria-hidden="true" />,
 };
 
 const fmtTimestamp = (iso: string): string =>
@@ -362,7 +365,7 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
             {isDoNotContact ? (
               <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
                 <p className="text-xs font-bold uppercase tracking-wider text-red-400">
-                  🚫 Do not contact
+                  <ShieldOff className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />Do not contact
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
                   {dncSuccess

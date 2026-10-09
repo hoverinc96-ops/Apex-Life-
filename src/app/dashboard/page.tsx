@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { FileText, Link2, Shield } from "lucide-react";
+
 import Link from "next/link";
 import ImportLeadsPanel from "@/components/ImportLeadsPanel";
 import LeadDetailPanel from "@/components/LeadDetailPanel";
@@ -134,7 +136,7 @@ export default function DashboardHomePage() {
             aria-expanded={csvOpen}
             className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">📄</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600"><FileText className="h-4 w-4" aria-hidden="true" /></span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Import CSV</span>
               <span className="block text-xs text-slate-500">Bulk-upload your lead list</span>
@@ -145,7 +147,7 @@ export default function DashboardHomePage() {
             onClick={() => setShareOpen(true)}
             className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">🔗</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600"><Link2 className="h-4 w-4" aria-hidden="true" /></span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Share quote link</span>
               <span className="block text-xs text-slate-500">Send people to your quote form</span>
@@ -155,7 +157,7 @@ export default function DashboardHomePage() {
             href="/dashboard/compliance"
             className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-emerald-300"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600">🛡️</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600"><Shield className="h-4 w-4" aria-hidden="true" /></span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">Do-not-contact registry</span>
               <span className="block text-xs text-slate-500">Review opt-outs and consent</span>

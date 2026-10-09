@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Mic } from "lucide-react";
+
 
 type Latency = { sttMs: number; llmMs: number; ttsMs: number; totalMs: number };
 type Turn = { id: number; speaker: "customer" | "agent"; text: string; latency?: Latency };
@@ -260,7 +262,7 @@ export default function VoiceTestPage() {
               disabled={busy || !audioSupported}
               className="rounded-lg bg-rose-500/90 px-6 py-3 text-sm font-bold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              🎙 Record
+              <Mic className="mr-1.5 -mt-0.5 inline h-4 w-4" aria-hidden="true" />Record
             </button>
           ) : (
             <button

@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { FolderOpen, Inbox } from "lucide-react";
+
 import { Handoff, HandoffContext, TeamMember, HandoffPriority } from "@/lib/team-types";
 
 type InboxView = "active" | "declined";
@@ -500,7 +502,7 @@ export default function InboxPage() {
         ) : view === "active" ? (
           handoffs.length === 0 ? (
             <div className="rounded-xl border border-dashed border-navy-600 bg-navy-800/30 px-6 py-16 text-center">
-              <div className="text-3xl">📥</div>
+              <div className="text-3xl"><Inbox className="mx-auto h-8 w-8" aria-hidden="true" /></div>
               <p className="mt-3 text-sm font-semibold text-slate-300">No open handoffs</p>
               <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
                 When the owner assigns an AI-qualified lead to a rep, it will show up here
@@ -512,7 +514,7 @@ export default function InboxPage() {
           )
         ) : declined.length === 0 ? (
           <div className="rounded-xl border border-dashed border-navy-600 bg-navy-800/30 px-6 py-16 text-center">
-            <div className="text-3xl">🗂️</div>
+            <div className="text-3xl"><FolderOpen className="mx-auto h-8 w-8" aria-hidden="true" /></div>
             <p className="mt-3 text-sm font-semibold text-slate-300">No declined handoffs</p>
             <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">
               Declined handoffs are kept here so they aren&apos;t lost. When a rep

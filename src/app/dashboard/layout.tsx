@@ -4,19 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ShareLinkModal from "@/components/ShareLinkModal";
+import { BarChart3, Calendar, CircleDot, FolderOpen, Home, Inbox, MessageSquare, Mic, Shield, Users, Workflow } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Overview", icon: "🏠" },
-  { href: "/dashboard/clients", label: "Clients", icon: "🗂️" },
-  { href: "/dashboard/owner", label: "Owner Pipeline", icon: "👑" },
-  { href: "/dashboard/owner/calendar", label: "Calendar Sync", icon: "📅" },
-  { href: "/dashboard/conversations", label: "Conversations", icon: "💬" },
-  { href: "/dashboard/analytics", label: "Analytics", icon: "📊" },
-  { href: "/dashboard/inbox", label: "Rep Handoff Inbox", icon: "📥" },
-  { href: "/dashboard/team", label: "Team & Roles", icon: "👥" },
-  { href: "/dashboard/compliance", label: "Compliance", icon: "🛡️" },
-  { href: "/dashboard/live-monitor", label: "Live Monitor", icon: "🔴" },
-  { href: "/dashboard/voice-test", label: "Voice Test", icon: "🎙️" },
+  { href: "/dashboard", label: "Overview", icon: Home },
+  { href: "/dashboard/clients", label: "Clients", icon: FolderOpen },
+  { href: "/dashboard/owner", label: "Owner Pipeline", icon: Workflow },
+  { href: "/dashboard/owner/calendar", label: "Calendar Sync", icon: Calendar },
+  { href: "/dashboard/conversations", label: "Conversations", icon: MessageSquare },
+  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/dashboard/inbox", label: "Rep Handoff Inbox", icon: Inbox },
+  { href: "/dashboard/team", label: "Team & Roles", icon: Users },
+  { href: "/dashboard/compliance", label: "Compliance", icon: Shield },
+  { href: "/dashboard/live-monitor", label: "Live Monitor", icon: CircleDot },
+  { href: "/dashboard/voice-test", label: "Voice Test", icon: Mic },
 ];
 
 function pageTitle(pathname: string): string {
@@ -66,7 +67,7 @@ export default function DashboardLayout({
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
-                <span className="text-base">{item.icon}</span>
+                <item.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                 {item.label}
               </Link>
             );
