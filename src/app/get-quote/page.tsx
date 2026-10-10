@@ -1098,7 +1098,7 @@ export default function GetQuotePage() {
   };
 
   return (
-    <main className="wash-quote-shell min-h-screen bg-[#F7F6F2] text-navy-900">
+    <main className="wash-quote-shell min-h-screen bg-transparent text-navy-900">
       <a
         href="#questions"
         onClick={skipToQuestions}
