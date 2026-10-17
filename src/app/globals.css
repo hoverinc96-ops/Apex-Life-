@@ -1,17 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Palette v4 (2026-09-22, FINAL — see /home/team/shared/ethos-style-crm-spec.md) ──
-     Green + white + gold. The legacy navy- and gold- tokens are REDEFINED —
-     Tailwind v4 compiles utilities like bg-navy-800 to var(--color-navy-800),
-     so existing class usage remaps to the new palette site-wide without
-     touching every file:
+  /* ── Palette v5 (2026-10-12, owner directive — see /home/team/shared/ethos-style-crm-spec.md) ──
+     Blue + white + gold (owner: differentiation from Ethos — no greens anywhere).
+     Two remap layers sit on top of Tailwind's default scale.
+
+     1) Legacy remaps (v4, unchanged): Tailwind v4 compiles utilities like
+     bg-navy-800 to var(--color-navy-800), so existing class usage remaps to
+     the new palette site-wide without touching every file:
        navy-*  (retired dark surfaces) → white / slate surface equivalents
        gold-*  (retired muted #d4a843) → bright amber; darker ambers keep
                gold-as-text readable on white. Flourish only, never buttons.
        slate-300/400/500/600 (light text tuned for dark surfaces) → dark grays.
-     navy-as-TEXT and solid-gold BUTTONS can't be fixed by tokens alone —
-     see the class-level remaps below. */
+
+     2) v5 emerald→blue remap: every emerald-* token is REDEFINED to the
+     blue scale 1:1, so all bg-/text-/ring-emerald-* utilities in the codebase
+     render blue without touching a single class name (copy is compliance-
+     frozen; only colors change). emerald-300 keeps its v4 role — status text
+     tuned for white surfaces — via the same 700-value step-down the green
+     palette used. NO green value remains in this file. */
   --color-navy-900: #ffffff;
   --color-navy-800: #f8fafc;
   --color-navy-700: #e2e8f0;
@@ -24,21 +31,32 @@
   --color-slate-400: #475569;
   --color-slate-500: #64748b;
   --color-slate-600: #64748b;
+  /* emerald-* → blue-* 1:1 (v5 owner directive 2026-10-12: Ethos differentiation) */
+  --color-emerald-50: #eff6ff;
+  --color-emerald-100: #dbeafe;
+  --color-emerald-200: #bfdbfe;
+  --color-emerald-300: #1d4ed8; /* status text — same 700-value step-down as v4 */
+  --color-emerald-400: #60a5fa;
+  --color-emerald-500: #3b82f6;
+  --color-emerald-600: #2563eb; /* primary */
+  --color-emerald-700: #1d4ed8; /* hover */
+  --color-emerald-800: #1e40af;
+  --color-emerald-900: #1e3a8a;
+  --color-emerald-950: #172554; /* headings */
   /* status/feedback text that was tuned for dark surfaces */
-  --color-emerald-300: #047857;
   --color-rose-300: #be123c;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 html { scroll-behavior: smooth; }
-/* v4: light page background, dark ink — the dark-navy body is retired. */
+/* v5: light page background, dark ink — the dark-navy body is retired. */
 body {
   min-height: 100vh;
   background-color: #ffffff;
-  /* Page-wide gradient: white to faint emerald-50, plus a soft emerald radial glow at the top. */
+  /* Page-wide gradient: white to faint blue-50, plus a soft blue radial glow at the top. */
   background-image:
-    radial-gradient(1100px 480px at 50% -160px, rgba(5, 150, 105, 0.06), transparent 70%),
-    linear-gradient(180deg, #ffffff 0%, #f6fdf9 45%, #ecfdf5 100%);
+    radial-gradient(1100px 480px at 50% -160px, rgba(37, 99, 235, 0.06), transparent 70%),
+    linear-gradient(180deg, #ffffff 0%, #f6f9fe 45%, #eff6ff 100%);
   background-repeat: no-repeat;
   color: #0f172a;
   font-family: var(--font-sans);
@@ -57,10 +75,11 @@ body {
   html { scroll-behavior: auto; }
 }
 
-/* ── Palette v4 class-level remaps (global — previously scoped to .dash-light) ──
+/* ── Palette v4/v5 class-level remaps (global — previously scoped to .dash-light) ──
    Patterns the token redefinition can't express on its own.
 
-   ONE button color — emerald-600 with white text, hover emerald-700.
+   ONE button color — bg-emerald-600 with white text, hover bg-emerald-700
+   (in v5 those tokens render blue-600/blue-700; class names are unchanged).
    Legacy solid-gold buttons are converted at the call site to
    bg-emerald-600 / text-white / hover:bg-emerald-700; the remaining solid
    bg-gold-500 usages are accents (status dots, avatar chips, the quote-wizard
@@ -77,16 +96,16 @@ body {
 .text-navy-700 { color: #334155; }
 .text-navy-600 { color: #475569; }
 .hover\:text-navy-900:hover { color: #0f172a; }
-/* v4: headings are deep green (emerald-950) everywhere they don't sit on a
+/* v5: headings are deep blue (blue-950 #172554) everywhere they don't sit on a
    colored surface. */
 h1:not(.text-white),
 h2:not(.text-white),
 h3:not(.text-white) {
-  color: #022c22;
+  color: #172554;
 }
 /* White and near-white text was tuned for dark surfaces; flip it to dark —
    except on solid action buttons that keep white text: red/rose
-   (take-over / delete) and emerald-600/700/950 (v4 primary). */
+   (take-over / delete) and emerald-600/700/950 (primary — renders blue in v5). */
 :not(.bg-red-500):not(.bg-red-600):not(.bg-rose-500):not(.bg-rose-600):not(.bg-rose-500\/90):not(.bg-emerald-600):not(.bg-emerald-700):not(.bg-emerald-950).text-white {
   color: #0f172a;
 }
@@ -99,69 +118,71 @@ h3:not(.text-white) {
   color: #0f172a;
 }
 
-/* ── Pop pass: gradience system (design spec 2026-09-29; CSS-only, palette v4) ── */
+/* ── Pop pass: gradience system (design spec 2026-09-29; v5 recolor 2026-10-12) ── */
 
 /* 1a. Hero wash — layered radial glows over a base sheen. One element, no filter:blur
       (each background layer paints in one pass — cheaper than blurred divs). */
 .wash-hero {
   background:
-    /* emerald glow, top-left (replaces gold orb's job, on-palette) */
-    radial-gradient(52rem 36rem at 15% -8%, rgba(5, 150, 105, 0.12), transparent 62%),
+    /* blue glow, top-left (on-palette) */
+    radial-gradient(52rem 36rem at 15% -8%, rgba(37, 99, 235, 0.12), transparent 62%),
     /* amber halo behind the centered badge + h1 area — whisper only */
     radial-gradient(30rem 20rem at 50% 20%, rgba(245, 158, 11, 0.06), transparent 70%),
-    /* emerald whisper, bottom-right (replaces the off-palette blue-500 orb) */
-    radial-gradient(46rem 30rem at 88% 80%, rgba(5, 150, 105, 0.07), transparent 65%),
-    /* base: white → slate-50 → emerald-50 diagonal sheen */
-    linear-gradient(160deg, #ffffff 0%, #f8fafc 46%, #ecfdf5 100%);
+    /* blue whisper, bottom-right */
+    radial-gradient(46rem 30rem at 88% 80%, rgba(37, 99, 235, 0.07), transparent 65%),
+    /* base: white → slate-50 → blue-50 diagonal sheen */
+    linear-gradient(160deg, #ffffff 0%, #f8fafc 46%, #eff6ff 100%);
 }
 
 /* 1b. Dot texture — masked so it dissolves before mid-page; never behind text-dense
       areas below the hero. Optional (step 3 of implementation order). */
 .dots-fade {
-  background-image: radial-gradient(rgba(5, 150, 105, 0.12) 1px, transparent 1.4px);
+  background-image: radial-gradient(rgba(37, 99, 235, 0.12) 1px, transparent 1.4px);
   background-size: 22px 22px;
   -webkit-mask-image: radial-gradient(62rem 42rem at 50% 0%, #000 26%, transparent 74%);
   mask-image: radial-gradient(62rem 42rem at 50% 0%, #000 26%, transparent 74%);
   opacity: 0.55;
 }
 
-/* 1c. Section tint with soft vertical fade (white ↔ emerald-50, no hard edges). */
+/* 1c. Section tint with soft vertical fade (white ↔ blue-50, no hard edges). */
 .section-tint-fade {
   background: linear-gradient(
     180deg,
-    rgba(236, 253, 245, 0) 0%,
-    #ecfdf5 14%,
-    #ecfdf5 86%,
-    rgba(236, 253, 245, 0) 100%
+    rgba(239, 246, 255, 0) 0%,
+    #eff6ff 14%,
+    #eff6ff 86%,
+    rgba(239, 246, 255, 0) 100%
   );
 }
 
-/* 1d. Feature-card gradient hairline border (1px, emerald→slate→amber). */
+/* 1d. Feature-card gradient hairline border (1px, blue→slate→amber). */
 .card-ring {
   border: 1px solid transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(135deg, rgba(5, 150, 105, 0.32), rgba(203, 213, 225, 0.55) 42%, rgba(245, 158, 11, 0.26)) border-box;
-  box-shadow: 0 1px 2px rgba(2, 44, 34, 0.04);
+    linear-gradient(135deg, rgba(37, 99, 235, 0.32), rgba(203, 213, 225, 0.55) 42%, rgba(245, 158, 11, 0.26)) border-box;
+  box-shadow: 0 1px 2px rgba(23, 37, 84, 0.04);
   transition: box-shadow 200ms ease, transform 200ms ease;
 }
 .card-ring:hover,
 .card-ring:focus-visible {
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(135deg, rgba(5, 150, 105, 0.55), rgba(203, 213, 225, 0.4) 42%, rgba(245, 158, 11, 0.45)) border-box;
-  box-shadow: 0 14px 32px -14px rgba(5, 150, 105, 0.22), 0 1px 2px rgba(2, 44, 34, 0.05);
+    linear-gradient(135deg, rgba(37, 99, 235, 0.55), rgba(203, 213, 225, 0.4) 42%, rgba(245, 158, 11, 0.45)) border-box;
+  box-shadow: 0 14px 32px -14px rgba(37, 99, 235, 0.22), 0 1px 2px rgba(23, 37, 84, 0.05);
   transform: translateY(-2px);
 }
 
 /* 1e. Soft inner wash for panels (Pilot panel, /book panel, get-quote intro card). */
 .wash-panel {
-  background-image: radial-gradient(38rem 16rem at 50% 0%, rgba(5, 150, 105, 0.06), transparent 70%);
+  background-image: radial-gradient(38rem 16rem at 50% 0%, rgba(37, 99, 235, 0.06), transparent 70%);
 }
 
-/* 1f. Amber glow ring for ◆ marks, progress "current" segment, trust badges. */
+/* 1f. Amber glow ring for ◆ marks, progress "current" segment, trust badges.
+   (1g sibling: .glow-emerald keeps its class name — class names are not copy —
+   but its ring now renders the v5 blue, same alpha as before.) */
 .glow-amber { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.14); }
-.glow-emerald { box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.14); }
+.glow-emerald { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14); }
 
 /* 1g. ◆ sheen — opt-in via .mark-sheen; never applied anywhere by default. */
 @media (prefers-reduced-motion: no-preference) {
@@ -182,9 +203,9 @@ h3:not(.text-white) {
 @media (max-width: 640px) {
   .wash-hero {
     background:
-      radial-gradient(34rem 26rem at 20% -6%, rgba(5, 150, 105, 0.10), transparent 62%),
+      radial-gradient(34rem 26rem at 20% -6%, rgba(37, 99, 235, 0.10), transparent 62%),
       radial-gradient(24rem 16rem at 50% 16%, rgba(245, 158, 11, 0.05), transparent 70%),
-      linear-gradient(170deg, #ffffff 0%, #f8fafc 55%, #ecfdf5 100%);
+      linear-gradient(170deg, #ffffff 0%, #f8fafc 55%, #eff6ff 100%);
   }
   .dots-fade { display: none; }
   .card-ring:hover { transform: none; } /* no hover-lift on touch */
@@ -193,7 +214,7 @@ h3:not(.text-white) {
 /* 2d/2e. Funnel shell + gold-note halos (utilities for the get-quote main and
    booking gold note panel — spec allows a small utility instead of inline soup). */
 .wash-quote-shell {
-  background-image: radial-gradient(46rem 22rem at 50% -6%, rgba(5, 150, 105, 0.05), transparent 62%);
+  background-image: radial-gradient(46rem 22rem at 50% -6%, rgba(37, 99, 235, 0.05), transparent 62%);
 }
 .glow-amber-wash {
   background-image: radial-gradient(24rem 10rem at 50% 0%, rgba(245, 158, 11, 0.07), transparent 70%);
