@@ -523,19 +523,21 @@ export default function GetQuotePage() {
             const canClick =
               !isCurrent && s < step && s <= 9 && (s === 9 || fieldComplete(s));
             return (
-              <li key={s} className="h-[6px] flex-1">
+              <li key={s} className="-my-5 flex flex-1 items-center py-5">
                 {canClick ? (
                   <button
                     type="button"
                     aria-label={`Go back to step ${s}: ${STEP_QUESTIONS[s - 1]}`}
                     onClick={() => selectStep(s)}
-                    className="block h-full w-full rounded-full bg-gold-500 transition hover:bg-gold-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
-                  />
+                    className="group block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
+                  >
+                    <span className="mx-auto block h-[6px] w-full rounded-full bg-gold-500 transition group-hover:bg-gold-400" />
+                  </button>
                 ) : (
                   <span
                     aria-current={isCurrent ? "step" : undefined}
                     aria-disabled={!isPast && !isCurrent ? true : undefined}
-                    className={`block h-full w-full rounded-full ${
+                    className={`block h-[6px] w-full rounded-full ${
                       isCurrent
                         ? "glow-emerald bg-gold-500 ring-2 ring-inset ring-navy-900/70"
                         : isPast
@@ -560,7 +562,7 @@ export default function GetQuotePage() {
           type="button"
           onClick={() => goTo(step === 1 ? INTRO : step - 1)}
           aria-label="Back to previous question"
-          className="-ml-2 rounded-lg px-2 py-2 text-sm font-medium text-navy-700 transition hover:underline hover:underline-offset-4 hover:decoration-gold-500 hover:text-navy-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
+          className="-ml-2 inline-flex min-h-[44px] items-center rounded-lg px-2 py-2 text-sm font-medium text-navy-700 transition hover:underline hover:underline-offset-4 hover:decoration-gold-500 hover:text-navy-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
         >
           ← Back
         </button>
@@ -979,7 +981,7 @@ export default function GetQuotePage() {
                 type="button"
                 onClick={() => selectStep(row.target)}
                 aria-label={`Change ${row.label.toLowerCase()}`}
-                className="shrink-0 rounded-lg px-2 py-1.5 text-[13px] font-medium text-navy-700 underline-offset-4 transition hover:text-navy-900 hover:underline hover:decoration-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
+                className="flex min-h-[44px] shrink-0 items-center rounded-lg px-2 py-1.5 text-[13px] font-medium text-navy-700 underline-offset-4 transition hover:text-navy-900 hover:underline hover:decoration-gold-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f59e0b]"
               >
                 Change
               </button>
@@ -1125,7 +1127,7 @@ export default function GetQuotePage() {
           <a
             href="/"
             onClick={exitHome}
-            className="px-2 py-2 text-sm font-medium text-slate-500 transition hover:text-navy-900 hover:underline hover:underline-offset-4 hover:decoration-gold-500"
+            className="inline-flex min-h-[44px] items-center px-2 py-2 text-sm font-medium text-slate-500 transition hover:text-navy-900 hover:underline hover:underline-offset-4 hover:decoration-gold-500"
           >
             ← Back to Apex Life AI
           </a>
