@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Check } from "lucide-react";
 
 
 interface ImportResult {

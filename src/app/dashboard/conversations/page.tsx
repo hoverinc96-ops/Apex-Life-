@@ -99,7 +99,7 @@ export default function ConversationsPage() {
       {!loading && !error && conversations.length === 0 && (
         <div className="mt-16 flex flex-col items-center justify-center text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-navy-800">
-            <MessageSquare className="h-7 w-7" aria-hidden="true" />
+            <MessageSquare className="h-8 w-8" aria-hidden="true" />
           </div>
           <h3 className="text-base font-semibold text-slate-300">No conversations yet</h3>
           <p className="mt-1 max-w-sm text-sm text-slate-500">
