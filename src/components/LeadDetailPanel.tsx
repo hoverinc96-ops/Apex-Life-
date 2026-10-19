@@ -365,7 +365,7 @@ export default function LeadDetailPanel({ lead, onClose, onStatusChange }: LeadD
             {isDoNotContact ? (
               <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
                 <p className="text-xs font-bold uppercase tracking-wider text-red-400">
-                  <ShieldOff className="mr-1 inline h-3.5 w-3.5" aria-hidden="true" />Do not contact
+                  <ShieldOff className="mr-1 inline h-3 w-3" aria-hidden="true" />Do not contact
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
                   {dncSuccess
