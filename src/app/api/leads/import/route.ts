@@ -100,7 +100,12 @@ export async function POST(request: NextRequest) {
         // identical header/validation/dedupe/insert logic below.
         const buf = Buffer.from(await file.arrayBuffer());
         const workbook = new ExcelJS.Workbook();
-        await workbook.xlsx.load(buf);
+        // exceljs bundles non-generic Buffer typings that clash with @types/node 22's
+        // generic Buffer; cast through unknown — the runtime call is unchanged.
+        const loadXlsx = workbook.xlsx.load.bind(workbook.xlsx) as unknown as (
+          data: Buffer
+        ) => Promise<ExcelJS.Workbook>;
+        await loadXlsx(buf);
         const sheet = workbook.worksheets[0];
         if (!sheet) throw new Error("workbook has no worksheets");
         rows = [];
