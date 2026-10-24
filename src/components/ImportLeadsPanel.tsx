@@ -34,7 +34,7 @@ export default function ImportLeadsPanel({
 
   const handleImport = async () => {
     if (!file) {
-      setError("Choose a CSV file first.");
+      setError("Choose a CSV or Excel (.xlsx) file first.");
       return;
     }
     setImporting(true);
@@ -75,7 +75,7 @@ export default function ImportLeadsPanel({
         >
           <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
         </svg>
-        Import leads from CSV
+        Import leads from CSV or Excel
         <span className="ml-1 rounded-full border border-gold-500/30 bg-gold-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold-400">
           Upload
         </span>
