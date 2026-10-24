@@ -86,13 +86,13 @@ export default function ImportLeadsPanel({
           <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
             <div>
               <label htmlFor="leads-csv-file" className="mb-1.5 block text-xs font-medium text-slate-400">
-                CSV file <span className="text-slate-500">(columns: first_name, last_name, email, phone, state, coverage_amount, notes)</span>
+                CSV or Excel (.xlsx) file <span className="text-slate-500">(columns: first_name, last_name, email, phone, state, coverage_amount, notes)</span>
               </label>
               <input
                 ref={inputRef}
                 id="leads-csv-file"
                 type="file"
-                accept=".csv,text/csv"
+                accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 onChange={handleFileChange}
                 className="block w-full max-w-md cursor-pointer rounded-lg border border-navy-700/50 bg-navy-800/60 text-sm text-slate-300 file:mr-3 file:rounded-md file:border-0 file:bg-navy-700 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-gold-400 hover:file:bg-navy-600"
               />

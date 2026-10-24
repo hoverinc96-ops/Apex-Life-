@@ -1,11 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parse } from "csv-parse/sync";
+import ExcelJS from "exceljs";
 import type { PoolClient } from "pg";
 import pool from "@/lib/db";
 import { normalizePhone } from "@/lib/pii-scrubber";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 const MAX_ROWS = 10_000;
+const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+/**
+ * Flattens one Excel cell value (string | number | Date | formula/rich-text/hyperlink
+ * object) into the plain string the CSV pipeline expects.
+ */
+function cellToString(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  if (typeof value === "object") {
+    const v = value as Record<string, unknown>;
+    if (v.result !== undefined && v.result !== null) return cellToString(v.result); // formula result
+    if (Array.isArray(v.richText)) {
+      return v.richText
+        .map((rt) => cellToString((rt as { text?: string }).text))
+        .join("");
+    }
+    if (v.text !== undefined && v.text !== null) return String(v.text); // hyperlink / rich text fallback
+    return "";
+  }
+  return String(value);
+}
 
 const US_STATES = new Set([
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID",
@@ -48,33 +71,70 @@ export async function POST(request: NextRequest) {
       );
     }
     const file = entry as File;
+
+    const fileName = (file.name || "").toLowerCase();
+    const isXlsx = fileName.endsWith(".xlsx") || file.type === XLSX_MIME;
+
     if (file.size > MAX_FILE_BYTES) {
       return NextResponse.json(
-        { error: "CSV file exceeds the 5 MB size limit." },
+        { error: isXlsx ? "File exceeds the 5 MB size limit." : "CSV file exceeds the 5 MB size limit." },
         { status: 413 }
       );
     }
 
-    const text = await file.text();
+    if (!isXlsx && fileName.endsWith(".xls")) {
+      return NextResponse.json(
+        { error: "Legacy .xls files are not supported. Re-save the spreadsheet as .xlsx (or export to CSV) and try again." },
+        { status: 415 }
+      );
+    }
+
+    // Same message wording per format; the CSV strings are unchanged.
+    const noun = isXlsx ? "Excel workbook" : "CSV";
+
     let rows: string[][];
     try {
-      rows = parse(text, { skip_empty_lines: true, trim: true }) as string[][];
+      if (isXlsx) {
+        // Excel: load the workbook and flatten the first sheet into the same
+        // string[][] shape the CSV path produces, then run it through the
+        // identical header/validation/dedupe/insert logic below.
+        const buf = Buffer.from(await file.arrayBuffer());
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buf);
+        const sheet = workbook.worksheets[0];
+        if (!sheet) throw new Error("workbook has no worksheets");
+        rows = [];
+        sheet.eachRow({ includeEmpty: false }, (row) => {
+          const values = row.values as unknown[]; // 1-based; index 0 unused
+          const cells: string[] = [];
+          for (let c = 1; c < values.length; c++) cells.push(cellToString(values[c]));
+          while (cells.length > 0 && cells[cells.length - 1] === "") cells.pop();
+          rows.push(cells);
+        });
+      } else {
+        const text = await file.text();
+        rows = parse(text, { skip_empty_lines: true, trim: true }) as string[][];
+      }
     } catch {
       return NextResponse.json(
-        { error: "Could not parse the file as CSV. Check quoting and delimiters." },
+        {
+          error: isXlsx
+            ? "Could not parse the file as an Excel workbook (.xlsx). Re-save it as .xlsx or export to CSV."
+            : "Could not parse the file as CSV. Check quoting and delimiters.",
+        },
         { status: 400 }
       );
     }
 
     if (rows.length < 2) {
       return NextResponse.json(
-        { error: "CSV must contain a header row and at least one data row." },
+        { error: `${noun} must contain a header row and at least one data row.` },
         { status: 400 }
       );
     }
     if (rows.length - 1 > MAX_ROWS) {
       return NextResponse.json(
-        { error: `CSV exceeds the ${MAX_ROWS.toLocaleString()} row import limit.` },
+        { error: `${noun} exceeds the ${MAX_ROWS.toLocaleString()} row import limit.` },
         { status: 400 }
       );
     }
@@ -98,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     if (idxFirstName === -1 || idxLastName === -1) {
       return NextResponse.json(
-        { error: "CSV header is missing required columns 'first_name' and 'last_name'." },
+        { error: `${noun} header is missing required columns 'first_name' and 'last_name'.` },
         { status: 400 }
       );
     }
