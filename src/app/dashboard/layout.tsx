@@ -46,7 +46,7 @@ export default function DashboardLayout({
   return (
     <div className="dash-light flex h-screen overflow-hidden bg-white text-slate-900">
       {/* Sidebar */}
-      <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
         {/* Logo */}
         <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
           <span className="text-lg text-amber-500">◆</span>
@@ -113,6 +113,26 @@ export default function DashboardLayout({
           </div>
         </header>
 
+        {/* Mobile nav strip (sidebar is hidden below md) */}
+        <nav className="flex gap-1 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2 md:hidden" aria-label="Dashboard navigation">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs transition ${
+                  isActive
+                    ? "border-emerald-200 bg-emerald-50 font-medium text-emerald-700"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <item.icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
         {/* Page content */}
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">{children}</div>
       </div>
