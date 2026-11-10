@@ -7,7 +7,9 @@ import { normalizePhone } from "@/lib/pii-scrubber";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5 MB
 const MAX_ROWS = 10_000;
-const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+const UNSUPPORTED_FILE_MESSAGE =
+  "We couldn't read this file type — please save it as .xlsx, .csv, or .txt and try again.";
 
 /**
  * Flattens one Excel cell value (string | number | Date | formula/rich-text/hyperlink
@@ -50,6 +52,95 @@ interface CsvRow {
   notes?: string;
 }
 
+/** True when the buffer starts with the zip local-file magic PK\x03\x04 (or an
+ *  empty-archive PK\x05\x04) — i.e. the container .xlsx lives in. */
+function isZipMagic(buf: Buffer): boolean {
+  return (
+    buf.length >= 4 &&
+    buf[0] === 0x50 && // P
+    buf[1] === 0x4b && // K
+    (buf[2] === 0x03 || buf[2] === 0x05) &&
+    buf[3] === 0x04
+  );
+}
+
+/**
+ * Decodes an upload to text regardless of encoding: handles UTF-8, UTF-8 BOM,
+ * and UTF-16 LE/BE BOM (transcoded), and strips any leftover BOM character.
+ */
+function decodeTextFile(buf: Buffer): string {
+  if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) {
+    return buf.subarray(3).toString("utf8");
+  }
+  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) {
+    return buf.subarray(2).toString("utf16le").replace(/^\uFEFF/, "");
+  }
+  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
+    const swapped = Buffer.from(buf.subarray(2));
+    swapped.swap16(); // BE → LE in place, then decode as LE
+    return swapped.toString("utf16le").replace(/^\uFEFF/, "");
+  }
+  return buf.toString("utf8").replace(/^\uFEFF/, "");
+}
+
+/**
+ * Heuristic binary check on decoded text: NUL bytes or a run of unusual
+ * control characters mean the file isn't delimited text (e.g. legacy .xls
+ * BIFF binaries, images, PDFs) and should get the friendly re-save error.
+ */
+function looksBinary(text: string): boolean {
+  const sample = text.slice(0, 4096);
+  if (sample.includes("\u0000")) return true;
+  let controlChars = 0;
+  for (let i = 0; i < sample.length; i++) {
+    const code = sample.charCodeAt(i);
+    if (code < 32 && code !== 9 && code !== 10 && code !== 13) controlChars++;
+  }
+  return sample.length > 0 && controlChars / sample.length > 0.02;
+}
+
+/**
+ * Picks a delimiter from the first non-empty line by majority count among the
+ * realistic candidates (comma, semicolon, tab, pipe). Comma wins ties; a line
+ * with none of them leaves the comma default.
+ */
+function sniffDelimiter(text: string): string {
+  const firstLine = text.split(/\r?\n/).find((line) => line.trim().length > 0) ?? "";
+  let best = ",";
+  let bestCount = 0;
+  for (const candidate of [",", ";", "\t", "|"]) {
+    const count = firstLine.split(candidate).length - 1;
+    if (count > bestCount) {
+      best = candidate;
+      bestCount = count;
+    }
+  }
+  return best;
+}
+
+/** Loads a zip-container workbook (.xlsx) and flattens its first sheet into
+ *  the same string[][] shape the CSV path produces. */
+async function parseXlsxBuffer(buf: Buffer): Promise<string[][]> {
+  const workbook = new ExcelJS.Workbook();
+  // exceljs bundles non-generic Buffer typings that clash with @types/node 22's
+  // generic Buffer; cast through unknown — the runtime call is unchanged.
+  const loadXlsx = workbook.xlsx.load.bind(workbook.xlsx) as unknown as (
+    data: Buffer
+  ) => Promise<ExcelJS.Workbook>;
+  await loadXlsx(buf);
+  const sheet = workbook.worksheets[0];
+  if (!sheet) throw new Error("workbook has no worksheets");
+  const rows: string[][] = [];
+  sheet.eachRow({ includeEmpty: false }, (row) => {
+    const values = row.values as unknown[]; // 1-based; index 0 unused
+    const cells: string[] = [];
+    for (let c = 1; c < values.length; c++) cells.push(cellToString(values[c]));
+    while (cells.length > 0 && cells[cells.length - 1] === "") cells.pop();
+    rows.push(cells);
+  });
+  return rows;
+}
+
 export async function POST(request: NextRequest) {
   const summary = {
     total: 0,
@@ -72,58 +163,43 @@ export async function POST(request: NextRequest) {
     }
     const file = entry as File;
 
-    const fileName = (file.name || "").toLowerCase();
-    const isXlsx = fileName.endsWith(".xlsx") || file.type === XLSX_MIME;
-
     if (file.size > MAX_FILE_BYTES) {
       return NextResponse.json(
-        { error: isXlsx ? "File exceeds the 5 MB size limit." : "CSV file exceeds the 5 MB size limit." },
+        { error: "File exceeds the 5 MB size limit." },
         { status: 413 }
       );
     }
 
-    if (!isXlsx && fileName.endsWith(".xls")) {
-      return NextResponse.json(
-        { error: "Legacy .xls files are not supported. Re-save the spreadsheet as .xlsx (or export to CSV) and try again." },
-        { status: 415 }
-      );
-    }
-
-    // Same message wording per format; the CSV strings are unchanged.
-    const noun = isXlsx ? "Excel workbook" : "CSV";
-
-    let rows: string[][];
+    // Decide the format by CONTENT, not by file name or MIME type — mobile
+    // pickers and renames make extensions unreliable, and any reasonable
+    // export should import. Zip magic (PK\x03\x04) → .xlsx path; anything that
+    // decodes as text (UTF-8 / UTF-8 BOM / UTF-16 BOM, comma, semicolon, tab,
+    // or pipe separated) goes through the CSV pipeline; a truly binary file
+    // gets the plain-language re-save error instead of a parser crash.
+    let rows: string[][] = [];
+    let noun = "CSV";
+    let zipPath = false;
     try {
-      if (isXlsx) {
-        // Excel: load the workbook and flatten the first sheet into the same
-        // string[][] shape the CSV path produces, then run it through the
-        // identical header/validation/dedupe/insert logic below.
-        const buf = Buffer.from(await file.arrayBuffer());
-        const workbook = new ExcelJS.Workbook();
-        // exceljs bundles non-generic Buffer typings that clash with @types/node 22's
-        // generic Buffer; cast through unknown — the runtime call is unchanged.
-        const loadXlsx = workbook.xlsx.load.bind(workbook.xlsx) as unknown as (
-          data: Buffer
-        ) => Promise<ExcelJS.Workbook>;
-        await loadXlsx(buf);
-        const sheet = workbook.worksheets[0];
-        if (!sheet) throw new Error("workbook has no worksheets");
-        rows = [];
-        sheet.eachRow({ includeEmpty: false }, (row) => {
-          const values = row.values as unknown[]; // 1-based; index 0 unused
-          const cells: string[] = [];
-          for (let c = 1; c < values.length; c++) cells.push(cellToString(values[c]));
-          while (cells.length > 0 && cells[cells.length - 1] === "") cells.pop();
-          rows.push(cells);
-        });
+      const buf = Buffer.from(await file.arrayBuffer());
+      zipPath = isZipMagic(buf);
+      if (zipPath) {
+        noun = "Excel workbook";
+        rows = await parseXlsxBuffer(buf);
       } else {
-        const text = await file.text();
-        rows = parse(text, { skip_empty_lines: true, trim: true }) as string[][];
+        const text = decodeTextFile(buf);
+        if (looksBinary(text)) {
+          return NextResponse.json({ error: UNSUPPORTED_FILE_MESSAGE }, { status: 415 });
+        }
+        rows = parse(text, {
+          delimiter: sniffDelimiter(text),
+          skip_empty_lines: true,
+          trim: true,
+        }) as string[][];
       }
     } catch {
       return NextResponse.json(
         {
-          error: isXlsx
+          error: zipPath
             ? "Could not parse the file as an Excel workbook (.xlsx). Re-save it as .xlsx or export to CSV."
             : "Could not parse the file as CSV. Check quoting and delimiters.",
         },

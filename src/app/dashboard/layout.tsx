@@ -46,7 +46,7 @@ export default function DashboardLayout({
   return (
     <div className="dash-light flex h-screen overflow-hidden bg-white text-slate-900">
       {/* Sidebar */}
-      <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
+      <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200 bg-white md:flex">
         {/* Logo */}
         <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
           <span className="text-lg text-amber-500">◆</span>
@@ -95,15 +95,15 @@ export default function DashboardLayout({
           <div>
             <h1 className="text-sm font-semibold text-emerald-950">{pageTitle(pathname)}</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setShareOpen(true)}
-              className="rounded-lg bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:px-3.5"
             >
               Share quote link
             </button>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               System Active
             </span>
@@ -113,6 +113,26 @@ export default function DashboardLayout({
           </div>
         </header>
 
+        {/* Mobile nav strip (sidebar is hidden below md) */}
+        <nav className="flex gap-1 overflow-x-auto border-b border-slate-200 bg-white px-3 py-2 md:hidden" aria-label="Dashboard navigation">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs transition ${
+                  isActive
+                    ? "border-emerald-200 bg-emerald-50 font-medium text-emerald-700"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <item.icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
         {/* Page content */}
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">{children}</div>
       </div>
