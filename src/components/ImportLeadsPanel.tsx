@@ -134,7 +134,7 @@ export default function ImportLeadsPanel({
                 {file ? file.name : "Tap to choose a file or drag it here"}
               </span>
               <span className="pointer-events-none text-xs text-slate-500">
-                CSV, Excel (.xlsx), or .txt · up to 5 MB · columns: first_name, last_name, email, phone, state, coverage_amount, notes
+                CSV, Excel, PDF, or .txt · up to 5 MB · columns: first_name, last_name, email, phone, state, coverage_amount, notes
               </span>
               <input
                 ref={inputRef}
