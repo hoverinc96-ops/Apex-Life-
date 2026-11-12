@@ -260,7 +260,6 @@ async function extractPdfLines(buf: Buffer): Promise<PdfExtraction> {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const loadingTask = pdfjs.getDocument({
     data: new Uint8Array(buf),
-    isEvalSupported: false,
     disableFontFace: true,
   });
   const doc = await loadingTask.promise;
