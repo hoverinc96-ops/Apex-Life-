@@ -11,6 +11,9 @@ const MAX_ROWS = 10_000;
 const UNSUPPORTED_FILE_MESSAGE =
   "We couldn't read this file type — please save it as .xlsx, .csv, or .txt and try again.";
 
+const SCANNED_PDF_MESSAGE =
+  "This PDF looks scanned — we can't read pictures of tables. Export from Excel as .xlsx or .csv and try again.";
+
 /**
  * Flattens one Excel cell value (string | number | Date | formula/rich-text/hyperlink
  * object) into the plain string the CSV pipeline expects.
@@ -62,6 +65,12 @@ function isZipMagic(buf: Buffer): boolean {
     (buf[2] === 0x03 || buf[2] === 0x05) &&
     buf[3] === 0x04
   );
+}
+
+/** True when the buffer contains the "%PDF-" signature within its first KB —
+ *  PDFs may carry junk bytes before the header, but never that far in. */
+function isPdfMagic(buf: Buffer): boolean {
+  return buf.subarray(0, 1024).includes("%PDF-");
 }
 
 /**
@@ -141,6 +150,181 @@ async function parseXlsxBuffer(buf: Buffer): Promise<string[][]> {
   return rows;
 }
 
+/**
+ * Column matching shared by every format: a header cell maps to a field when
+ * its normalized form (lowercase, non-alphanumerics stripped) is in that
+ * field's alias set — so "First Name", "firstname", and "FIRST-NAME" all match
+ * first_name, while unknown columns are ignored silently. Alias sets are
+ * disjoint, so one cell can only ever match one field.
+ */
+const FIELD_ALIASES: Record<string, string[]> = {
+  first_name: ["firstname", "first"],
+  last_name: ["lastname", "last", "surname", "familyname"],
+  email: ["email", "emailaddress", "mail"],
+  phone: ["phone", "phonenumber", "mobile", "cell", "cellphone", "contactnumber", "tel"],
+  state: ["state", "st"],
+  coverage_amount: ["coverageamount", "coverage", "coverageamountrequested"],
+  notes: ["notes", "note", "comments", "healthnotes"],
+};
+
+/** Bare "name"/"fullname" fallback — used ONLY when no first-name column exists. */
+const FULL_NAME_ALIASES = new Set(["name", "fullname"]);
+
+function normalizeHeaderCell(raw: string): string {
+  return raw.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+interface ColumnMap {
+  idx: Record<string, number>;
+  fullNameIdx: number;
+}
+
+/**
+ * Resolves which column serves each field: the first matching column wins per
+ * field. When no first-name column exists, a bare "name"/"fullname" column is
+ * remembered instead — its values split on whitespace (first token → first
+ * name, rest → last name) in the row loop.
+ */
+function resolveColumns(headerCells: string[]): ColumnMap {
+  const normalized = headerCells.map(normalizeHeaderCell);
+  const idx: Record<string, number> = {};
+  for (const [field, aliases] of Object.entries(FIELD_ALIASES)) {
+    idx[field] = -1;
+    for (let c = 0; c < normalized.length; c++) {
+      if (aliases.includes(normalized[c])) {
+        idx[field] = c;
+        break;
+      }
+    }
+  }
+  let fullNameIdx = -1;
+  if (idx.first_name === -1) {
+    for (let c = 0; c < normalized.length; c++) {
+      if (FULL_NAME_ALIASES.has(normalized[c])) {
+        fullNameIdx = c;
+        break;
+      }
+    }
+  }
+  return { idx, fullNameIdx };
+}
+
+/**
+ * Number of distinct alias sets a candidate header line matches. PDF header
+ * detection needs ≥2 so data rows (emails, phones, state codes) never qualify
+ * as the header.
+ */
+function countAliasMatches(cells: string[]): number {
+  const fields = new Set<string>();
+  for (const cell of cells) {
+    const n = normalizeHeaderCell(cell);
+    if (!n) continue;
+    for (const [field, aliases] of Object.entries(FIELD_ALIASES)) {
+      if (aliases.includes(n)) {
+        fields.add(field);
+        break;
+      }
+    }
+  }
+  return fields.size;
+}
+
+/** "10+ digits" marks a line as table data (a phone) — email or digits without
+ *  mistaking prose or dollar amounts for rows. */
+function digitCount(s: string): number {
+  return (s.match(/\d/g) || []).length;
+}
+
+interface PdfTextItem {
+  str: string;
+  transform: number[];
+  width?: number;
+}
+
+interface PdfExtraction {
+  lines: string[][]; // cells per visual line, reading order (page by page, top→bottom)
+  pages: number;
+  textChars: number;
+}
+
+/**
+ * Extracts visual lines from a PDF as cell arrays with pdfjs-dist. pdf-parse v2
+ * was tried first but its normalized text output collapses column gaps to single
+ * spaces (verified: positioned columns 20–200pt apart all extract as " "), which
+ * makes the 2+-separator row rule unsatisfiable for positioned tables — so
+ * columns are recovered geometrically here instead: whitespace items carry the
+ * gap width they span, and a gap wider than ~0.45× the font height (i.e. 2+
+ * space widths, matching the "2+ space-runs/tabs" row rule) is a column break.
+ */
+async function extractPdfLines(buf: Buffer): Promise<PdfExtraction> {
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(buf),
+    disableFontFace: true,
+  });
+  const doc = await loadingTask.promise;
+
+  const lines: string[][] = [];
+  let textChars = 0;
+
+  try {
+    for (let p = 1; p <= doc.numPages; p++) {
+      const page = await doc.getPage(p);
+      const content = await page.getTextContent();
+
+      // Group text items into visual lines by baseline y (2pt buckets absorb
+      // sub-pixel jitter between items on the same line).
+      const byLine = new Map<number, { str: string; x: number; endX: number; h: number }[]>();
+      for (const item of content.items as unknown as PdfTextItem[]) {
+        if (typeof item.str !== "string" || item.str.length === 0) continue;
+        textChars += item.str.replace(/\s/g, "").length;
+        const x = item.transform[4];
+        const y = item.transform[5];
+        const h = Math.abs(item.transform[3]) || 10;
+        const bucket = Math.round(y / 2) * 2;
+        let lineItems = byLine.get(bucket);
+        if (!lineItems) {
+          lineItems = [];
+          byLine.set(bucket, lineItems);
+        }
+        lineItems.push({ str: item.str, x, endX: x + (item.width ?? 0), h });
+      }
+
+      // Top of page first: y grows upward in PDF space.
+      for (const y of [...byLine.keys()].sort((a, b) => b - a)) {
+        const items = byLine.get(y)!.sort((a, b) => a.x - b.x);
+        const cells: string[] = [];
+        let cell = "";
+        let prevEnd: number | null = null;
+        let breakPending = false;
+        for (const it of items) {
+          if (it.str.trim().length === 0) {
+            // Whitespace item: the gap it spans is endX - x.
+            if (it.endX - it.x > it.h * 0.45) breakPending = true;
+            else if (cell.length > 0) cell += " ";
+            continue;
+          }
+          const xGap = prevEnd !== null ? it.x - prevEnd : 0;
+          if ((breakPending || xGap > it.h * 0.45) && cell.length > 0) {
+            cells.push(cell.trim());
+            cell = "";
+          }
+          breakPending = false;
+          cell += it.str;
+          prevEnd = it.endX;
+        }
+        if (cell.length > 0) cells.push(cell.trim());
+        const line = cells.filter((c) => c.length > 0);
+        if (line.length > 0) lines.push(line);
+      }
+    }
+  } finally {
+    await loadingTask.destroy();
+  }
+
+  return { lines, pages: doc.numPages, textChars };
+}
+
 export async function POST(request: NextRequest) {
   const summary = {
     total: 0,
@@ -172,19 +356,51 @@ export async function POST(request: NextRequest) {
 
     // Decide the format by CONTENT, not by file name or MIME type — mobile
     // pickers and renames make extensions unreliable, and any reasonable
-    // export should import. Zip magic (PK\x03\x04) → .xlsx path; anything that
-    // decodes as text (UTF-8 / UTF-8 BOM / UTF-16 BOM, comma, semicolon, tab,
-    // or pipe separated) goes through the CSV pipeline; a truly binary file
-    // gets the plain-language re-save error instead of a parser crash.
+    // export should import. Zip magic (PK\x03\x04) → .xlsx path; %PDF- magic →
+    // PDF table extraction; anything that decodes as text (UTF-8 / UTF-8 BOM /
+    // UTF-16 BOM, comma, semicolon, tab, or pipe separated) goes through the
+    // CSV pipeline; a truly binary file gets the plain-language re-save error
+    // instead of a parser crash.
     let rows: string[][] = [];
     let noun = "CSV";
     let zipPath = false;
+    let pdfPath = false;
     try {
       const buf = Buffer.from(await file.arrayBuffer());
       zipPath = isZipMagic(buf);
+      pdfPath = !zipPath && isPdfMagic(buf);
       if (zipPath) {
         noun = "Excel workbook";
         rows = await parseXlsxBuffer(buf);
+      } else if (pdfPath) {
+        noun = "PDF";
+        const extraction = await extractPdfLines(buf);
+        // Scanned or image-only PDFs: almost no extractable text per page, or
+        // no line that looks like a table data row (contains an email or 10+
+        // digits). Either way the pictures-of-tables message applies.
+        if (extraction.textChars < 40 * extraction.pages) {
+          return NextResponse.json({ error: SCANNED_PDF_MESSAGE }, { status: 422 });
+        }
+        const tableRows = extraction.lines.filter((cells) => cells.length >= 3); // 2+ separator runs
+        const hasDataRow = tableRows.some((cells) =>
+          cells.some((c) => EMAIL_RE.test(c) || digitCount(c) >= 10)
+        );
+        if (!hasDataRow) {
+          return NextResponse.json({ error: SCANNED_PDF_MESSAGE }, { status: 422 });
+        }
+        // Header = first candidate line matching ≥2 alias sets; only lines
+        // after it feed the pipeline as data rows.
+        const headerAt = tableRows.findIndex((cells) => countAliasMatches(cells) >= 2);
+        if (headerAt === -1) {
+          return NextResponse.json(
+            {
+              error:
+                "Couldn't find a header row with recognizable column names in this PDF. Include columns like First Name, Last Name, E-mail, or Full Name.",
+            },
+            { status: 400 }
+          );
+        }
+        rows = [tableRows[headerAt], ...tableRows.slice(headerAt + 1)];
       } else {
         const text = decodeTextFile(buf);
         if (looksBinary(text)) {
@@ -201,7 +417,9 @@ export async function POST(request: NextRequest) {
         {
           error: zipPath
             ? "Could not parse the file as an Excel workbook (.xlsx). Re-save it as .xlsx or export to CSV."
-            : "Could not parse the file as CSV. Check quoting and delimiters.",
+            : pdfPath
+              ? "Could not parse this PDF. If it's a scanned document, export the table as .xlsx or .csv and try again."
+              : "Could not parse the file as CSV. Check quoting and delimiters.",
         },
         { status: 400 }
       );
@@ -220,26 +438,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const header = rows[0].map((h) => h.trim().toLowerCase());
-    const col = (name: string) => header.indexOf(name);
-    const findCol = (...names: string[]) => {
-      for (const n of names) {
-        const idx = header.indexOf(n);
-        if (idx !== -1) return idx;
-      }
-      return -1;
-    };
-    const idxFirstName = col("first_name");
-    const idxLastName = col("last_name");
-    const idxEmail = findCol("email", "email_address");
-    const idxPhone = findCol("phone", "phone_number", "mobile", "cell");
-    const idxState = col("state");
-    const idxCoverage = findCol("coverage_amount", "coverage", "coverage_amount_requested");
-    const idxNotes = findCol("notes", "note", "comments", "health_notes");
+    // Column resolution is shared by every format: normalized header cells are
+    // matched against alias sets (so "First Name" and "firstname" both work),
+    // with the bare "name"/"fullname" fallback (values split on whitespace)
+    // when no first-name column exists. Unknown columns are ignored silently.
+    const { idx, fullNameIdx } = resolveColumns(rows[0]);
 
-    if (idxFirstName === -1 || idxLastName === -1) {
+    if (idx.first_name === -1 && fullNameIdx === -1) {
       return NextResponse.json(
-        { error: `${noun} header is missing required columns 'first_name' and 'last_name'.` },
+        {
+          error: `${noun} header is missing name columns — include "First Name" and "Last Name" (or "Surname"), or a "Full Name" column.`,
+        },
+        { status: 400 }
+      );
+    }
+    if (idx.first_name !== -1 && idx.last_name === -1 && fullNameIdx === -1) {
+      return NextResponse.json(
+        {
+          error: `${noun} header is missing a last-name column — include "Last Name" or "Surname", or use a "Full Name" column.`,
+        },
         { status: 400 }
       );
     }
@@ -264,17 +481,27 @@ export async function POST(request: NextRequest) {
     for (let i = 0; i < dataRows.length; i++) {
       const raw = dataRows[i];
       const csvLine = i + 2; // 1-based spreadsheet row (header is row 1)
-      const get = (idx: number): string =>
-        idx >= 0 && raw[idx] !== undefined ? String(raw[idx]).trim() : "";
+      const get = (colIdx: number): string =>
+        colIdx >= 0 && raw[colIdx] !== undefined ? String(raw[colIdx]).trim() : "";
+
+      let firstName = get(idx.first_name);
+      let lastName = get(idx.last_name);
+      if (fullNameIdx !== -1) {
+        // Bare "name"/"fullname" column: first whitespace token → first name,
+        // the rest → last name.
+        const tokens = get(fullNameIdx).split(/\s+/).filter(Boolean);
+        firstName = tokens[0] ?? "";
+        if (idx.last_name === -1) lastName = tokens.slice(1).join(" ");
+      }
 
       const record: CsvRow = {
-        first_name: get(idxFirstName),
-        last_name: get(idxLastName),
-        email: get(idxEmail),
-        phone: get(idxPhone),
-        state: get(idxState),
-        coverage_amount: get(idxCoverage),
-        notes: get(idxNotes),
+        first_name: firstName,
+        last_name: lastName,
+        email: get(idx.email),
+        phone: get(idx.phone),
+        state: get(idx.state),
+        coverage_amount: get(idx.coverage_amount),
+        notes: get(idx.notes),
       };
 
       // Skip fully empty rows (e.g. trailing commas) without counting them.
